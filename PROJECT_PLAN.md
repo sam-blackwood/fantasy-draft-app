@@ -199,10 +199,15 @@ Real-time fantasy draft application built as Portfolio Project #1 to demonstrate
    - CLI tool + Go library integration
    - Works seamlessly with pgx
 
+5. **Project Structure:** Monorepo with separate backend/frontend directories
+   - Single repository with clear separation
+   - `backend/` contains all Go code (cmd/, internal/, migrations/, go.mod)
+   - `frontend/` will contain React app (src/, package.json, vite.config.js)
+   - Clean organization for portfolio presentation
+
 ### Still To Decide:
 1. **React State Management:** Context API vs Redux vs Zustand?
-2. **Deployment Strategy:** Monorepo vs separate repos for backend/frontend?
-3. **Frontend Styling:** Tailwind CSS vs styled-components?
+2. **Frontend Styling:** Tailwind CSS vs styled-components?
 
 ---
 
