@@ -57,14 +57,18 @@ Real-time fantasy draft application built as Portfolio Project #1 to demonstrate
 3. **Player Board**
    - Display all available players
    - Search functionality
-   - Filter by position/team/stats
+   - Filter by status (professional/amateur) and country
    - Sort by various metrics
    - Real-time updates when players are drafted
+   - Support for draft stipulations (e.g., "must draft an amateur", "must draft someone from outside US")
 
 4. **Admin Event Management**
    - Create new events
    - Upload player pool (CSV or manual entry)
-   - Configure draft settings (number of teams, rounds, timer duration)
+   - Configure draft settings:
+     - Number of teams and draft timer duration
+     - Max picks per team (e.g., 6 players)
+     - Max teams that can draft the same player (1 for traditional, 2+ for Ryder Cup style)
    - Start/pause/reset drafts
    - View draft results
 
@@ -89,11 +93,28 @@ Real-time fantasy draft application built as Portfolio Project #1 to demonstrate
 - Generic "player" and "event" entities
 - Extensible to football, basketball, etc. beyond golf
 
+### Draft Configuration Flexibility
+Each event/draft supports configurable rules to accommodate different draft styles:
+- **Pick Limits:** Max picks per team (e.g., 6 players required)
+- **Player Availability:** Max teams that can draft the same player
+  - Traditional style: 1 (each player can only be drafted once, then off the board)
+  - Ryder Cup style: 2+ or unlimited (multiple teams can draft the same player)
+  - Note: Each team can only draft a player once (hard rule, not configurable)
+- **Player Attributes:** Status (professional/amateur) and country for draft stipulations
+- **Draft Stipulations:** Support rules like "must draft an amateur" or "must draft someone from outside US"
+
+### Database Schema
+- **Events:** Draft configuration (max picks, duplicate rules, status)
+- **Players:** Core info (name) + attributes (status, country) for filtering
+- **Users:** Team/participant info
+- **Draft_Results:** Picks made during the draft (linked to event, user, player)
+
 ### Key Technical Challenges
 1. **Real-time Synchronization** - Keep all clients in sync during draft
 2. **Connection Resilience** - Handle disconnects/reconnects gracefully
 3. **Concurrency** - Prevent race conditions in draft selections
-4. **Performance** - Sub-100ms response times for 12 concurrent users
+4. **Draft Rule Validation** - Enforce event-specific configuration rules
+5. **Performance** - Sub-100ms response times for 12 concurrent users
 
 ---
 
