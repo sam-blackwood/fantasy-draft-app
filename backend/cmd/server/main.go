@@ -13,6 +13,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/sblackwood23/fantasy-draft-app/internal/database"
+	"github.com/sblackwood23/fantasy-draft-app/internal/handlers"
+	"github.com/sblackwood23/fantasy-draft-app/internal/repository"
 )
 
 func main() {
@@ -27,6 +29,10 @@ func main() {
 
 	fmt.Println("Database connected successfully")
 
+	// Initialize repositories and handlers
+	eventRepo := repository.NewEventRepository(db.Pool)
+	eventHandler := handlers.NewEventHandler(eventRepo)
+
 	r := chi.NewRouter()
 
 	// Middleware
@@ -35,6 +41,11 @@ func main() {
 
 	// Routes
 	r.Get("/health", healthCheckHandler(db))
+	r.Get("/events/{id}", eventHandler.GetEvent)
+	r.Get("/events", eventHandler.ListEvents)
+	r.Post("/events", eventHandler.CreateEvent)
+	r.Put("/events/{id}", eventHandler.UpdateEvent)
+	r.Delete("/events/{id}", eventHandler.DeleteEvent)
 
 	// Start server
 	port := ":8080"
