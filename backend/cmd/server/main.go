@@ -32,6 +32,8 @@ func main() {
 	// Initialize repositories and handlers
 	eventRepo := repository.NewEventRepository(db.Pool)
 	eventHandler := handlers.NewEventHandler(eventRepo)
+	playerRepo := repository.NewPlayerRepository(db.Pool)
+	playerHandler := handlers.NewPlayerHandler(playerRepo)
 
 	r := chi.NewRouter()
 
@@ -41,11 +43,20 @@ func main() {
 
 	// Routes
 	r.Get("/health", healthCheckHandler(db))
+
+	// Events routes
 	r.Get("/events/{id}", eventHandler.GetEvent)
 	r.Get("/events", eventHandler.ListEvents)
 	r.Post("/events", eventHandler.CreateEvent)
 	r.Put("/events/{id}", eventHandler.UpdateEvent)
 	r.Delete("/events/{id}", eventHandler.DeleteEvent)
+
+	// Players routes
+	r.Get("/players/{id}", playerHandler.GetPlayer)
+	r.Get("/players", playerHandler.ListPlayers)
+	r.Post("/players", playerHandler.CreatePlayer)
+	r.Put("/players/{id}", playerHandler.UpdatePlayer)
+	r.Delete("/players/{id}", playerHandler.DeletePlayer)
 
 	// Start server
 	port := ":8080"
