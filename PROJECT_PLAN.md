@@ -72,7 +72,12 @@ Real-time fantasy draft application built as Portfolio Project #1 to demonstrate
    - Start/pause/reset drafts via API
    - View draft results
 
-5. **Group Access**
+5. **Auto-Draft Support**
+   - Handle absent users automatically when their turn arrives
+   - Configurable timeout before auto-draft kicks in
+   - Visual indication when a pick was auto-drafted
+
+6. **Group Access**
    - Password-protected draft rooms
    - No user accounts required
    - Session management for reconnections
@@ -104,10 +109,10 @@ Each event/draft supports configurable rules to accommodate different draft styl
 - **Draft Stipulations:** Support rules like "must draft an amateur" or "must draft someone from outside US"
 
 ### Database Schema
-- **Events:** Draft configuration (max picks, duplicate rules, status)
+- **Events:** Draft configuration (max picks, duplicate rules, status, auto-draft timeout)
 - **Players:** Core info (name) + attributes (status, country) for filtering
 - **Users:** Team/participant info
-- **Draft_Results:** Picks made during the draft (linked to event, user, player)
+- **Draft_Results:** Picks made during the draft (linked to event, user, player, is_auto_drafted flag)
 
 ### Key Technical Challenges
 1. **Real-time Synchronization** - Keep all clients in sync during draft
@@ -139,6 +144,9 @@ Each event/draft supports configurable rules to accommodate different draft styl
 - [ ] Build turn management and timer logic
 - [ ] Real-time player selection sync
 - [ ] Prevent race conditions in concurrent picks
+- [ ] Auto-draft system:
+  - [ ] Random strategy implementation
+  - [ ] Auto-draft timeout configuration
 - [ ] Reconnection handling for dropped connections
 - [ ] Persist draft results to database
 - [ ] Update event status (not_started → in_progress → completed)
@@ -152,6 +160,7 @@ Each event/draft supports configurable rules to accommodate different draft styl
 - [ ] Team roster display (live updates)
 - [ ] Draft timer and turn indicator
 - [ ] Real-time updates when players are drafted
+- [ ] Visual indicator for auto-drafted picks
 - [ ] Mobile-responsive design
 - [ ] Handle reconnection gracefully
 
