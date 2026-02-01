@@ -9,6 +9,14 @@ import (
 	"github.com/coder/websocket"
 )
 
+var manager *Manager
+
+// Set up the manager once the package is loaded
+func init() {
+	manager = NewManager()
+	go manager.Run()
+}
+
 // Client represents a WebSocket client connection
 type Client struct {
 	Conn *websocket.Conn
@@ -36,6 +44,8 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		Conn: conn,
 		Send: make(chan []byte, 256), // Buffered channel
 	}
+	// Register client with the draft manager
+	manager.Register(client)
 
 	// Start write pump in separate goroutine
 	go client.writePump(r.Context())
@@ -47,7 +57,8 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 // readPump handles incoming messages from the client
 func (c *Client) readPump(ctx context.Context) {
 	defer func() {
-		close(c.Send) // Close send channel when done
+		manager.Unregister(c) // Unregister client
+		close(c.Send)         // Close send channel when done
 		c.Conn.Close(websocket.StatusNormalClosure, "connection closed")
 		log.Println("Client disconnected")
 	}()
@@ -117,6 +128,6 @@ func (c *Client) handleMessage(data []byte) {
 		return
 	}
 
-	// Push response to send channel
-	c.Send <- responseData
+	// Broadcast response to all clients
+	manager.Broadcast(responseData)
 }
