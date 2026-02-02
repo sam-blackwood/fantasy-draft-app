@@ -9,7 +9,7 @@ import (
 	"github.com/sblackwood23/fantasy-draft-app/internal/handlers"
 )
 
-func setupRoutes(r *chi.Mux, db *database.DB, eventHandler *handlers.EventHandler, playerHandler *handlers.PlayerHandler, userHandler *handlers.UserHandler) {
+func setupRoutes(r *chi.Mux, db *database.DB, eventHandler *handlers.EventHandler, playerHandler *handlers.PlayerHandler, userHandler *handlers.UserHandler, eventPlayerHandler *handlers.EventPlayerHandler, draftRoomHandler *handlers.DraftRoomHandler) {
 	// Middleware
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
@@ -48,4 +48,13 @@ func setupRoutes(r *chi.Mux, db *database.DB, eventHandler *handlers.EventHandle
 	r.Post("/users", userHandler.CreateUser)
 	r.Put("/users/{id}", userHandler.UpdateUser)
 	r.Delete("/users/{id}", userHandler.DeleteUser)
+
+	// Event players routes
+	r.Get("/events/{id}/players", eventPlayerHandler.GetEventPlayers)
+	r.Post("/events/{id}/players", eventPlayerHandler.AddEventPlayers)
+	r.Delete("/events/{id}/players/{playerID}", eventPlayerHandler.RemoveEventPlayer)
+
+	// Draft room routes
+	r.Post("/events/{id}/draft-room", draftRoomHandler.CreateDraftRoom)
+	r.Get("/events/{id}/draft-room", draftRoomHandler.GetDraftRoom)
 }

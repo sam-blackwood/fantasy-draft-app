@@ -10,11 +10,24 @@ import (
 )
 
 var manager *Manager
+var draftState *DraftState = nil // Lazily instantiate
 
 // Set up the manager once the package is loaded
 func init() {
 	manager = NewManager()
 	go manager.Run()
+}
+
+// CreateRoom creates a new draft room for the given event with available players
+func CreateRoom(eventID int, playerIDs []int) error {
+	draftState = NewDraftState(eventID)
+	draftState.SetAvailablePlayers(playerIDs)
+	return nil
+}
+
+// GetRoom returns the current draft room state
+func GetRoom() *DraftState {
+	return draftState
 }
 
 // Client represents a WebSocket client connection

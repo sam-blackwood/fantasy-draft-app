@@ -35,11 +35,14 @@ func main() {
 	playerHandler := handlers.NewPlayerHandler(playerRepo)
 	userRepo := repository.NewUserRepository(db.Pool)
 	userHandler := handlers.NewUserHandler(userRepo)
+	eventPlayerRepo := repository.NewEventPlayerRepository(db.Pool)
+	eventPlayerHandler := handlers.NewEventPlayerHandler(eventPlayerRepo)
+	draftRoomHandler := handlers.NewDraftRoomHandler(eventPlayerRepo)
 
 	r := chi.NewRouter()
 
 	// Setup all routes
-	setupRoutes(r, db, eventHandler, playerHandler, userHandler)
+	setupRoutes(r, db, eventHandler, playerHandler, userHandler, eventPlayerHandler, draftRoomHandler)
 
 	// Start server
 	port := ":8080"
