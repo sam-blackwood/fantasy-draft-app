@@ -42,6 +42,7 @@ Real-time fantasy draft application built as Portfolio Project #1 to demonstrate
 
 ### Core Features (Must Have)
 1. **Real-time Draft Mechanics**
+   - Single active draft at a time (no concurrent draft rooms)
    - Live draft room with WebSocket connections
    - Turn-based selection system
    - Auto-advance turns with timer
@@ -78,7 +79,7 @@ Real-time fantasy draft application built as Portfolio Project #1 to demonstrate
    - Visual indication when a pick was auto-drafted
 
 6. **Group Access**
-   - Password-protected draft rooms
+   - Password-protected draft room
    - No user accounts required
    - Session management for reconnections
 
@@ -92,6 +93,9 @@ Real-time fantasy draft application built as Portfolio Project #1 to demonstrate
 ---
 
 ## Architecture Design
+
+### Single Draft Model
+The application supports one active draft at a time. This simplifies the WebSocket architecture - all connected clients are participating in the same draft. Multiple concurrent drafts are explicitly out of scope for MVP.
 
 ### Sport-Agnostic Data Model
 - Flexible JSONB metadata fields for sport-specific attributes
@@ -140,7 +144,7 @@ Each event/draft supports configurable rules to accommodate different draft styl
 ### Phase 2: Draft Logic & WebSockets (Weeks 2-3)
 - [ ] Design draft state machine
 - [ ] Create WebSocket server infrastructure
-- [ ] Implement draft room creation/joining
+- [ ] Implement draft room joining (single active draft)
 - [ ] Build turn management and timer logic
 - [ ] Real-time player selection sync
 - [ ] Prevent race conditions in concurrent picks
