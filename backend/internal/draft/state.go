@@ -190,7 +190,7 @@ func (d *DraftState) advanceTurn() {
 
 	d.currentTurnID = d.pickOrder[positionInRound]
 
-	// Restart timer for next pick
+	// Start timer for next pick
 	d.startTimer(d.timerDuration)
 
 	// Emit turn changed message
@@ -231,8 +231,8 @@ func (d *DraftState) MakePick(userID, playerID int) (*PickResult, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
-	if d.draftStatus != StatusInProgress {
-		return nil, fmt.Errorf("draft is not in progress")
+	if d.draftStatus != StatusInProgress && d.draftStatus != StatusPaused {
+		return nil, fmt.Errorf("draft is not active")
 	}
 
 	if userID != d.currentTurnID {
@@ -246,6 +246,11 @@ func (d *DraftState) MakePick(userID, playerID int) (*PickResult, error) {
 	// Stop the current timer (pick was made in time)
 	if d.pickTimer != nil {
 		d.pickTimer.Stop()
+	}
+
+	// If paused, resume the draft
+	if d.draftStatus == StatusPaused {
+		d.draftStatus = StatusInProgress
 	}
 
 	// Remove player from available list
@@ -330,6 +335,7 @@ func (d *DraftState) ResumeDraft() error {
 		"type":         MsgTypeDraftResumed,
 		"eventID":      d.eventID,
 		"currentTurn":  d.currentTurnID,
+		"roundNumber":  d.roundNumber,
 		"turnDeadline": d.turnDeadline.Unix(),
 	})
 	d.outgoing <- msg
