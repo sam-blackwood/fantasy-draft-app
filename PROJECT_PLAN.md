@@ -21,7 +21,7 @@ Real-time fantasy draft application built as Portfolio Project #1 to demonstrate
 - **Web Framework:** Chi (lightweight, idiomatic Go)
 - **Database:** PostgreSQL
 - **Database Layer:** pgx + pgxpool (PostgreSQL-native driver)
-- **WebSockets:** nhooyr.io/websocket (modern, context-based API)
+- **WebSockets:** coder/websocket (modern, context-based API)
 - **Migrations:** golang-migrate/migrate (SQL-based versioning)
 - **Testing:** Go standard testing + PostgreSQL dev database
 
@@ -142,18 +142,18 @@ Each event/draft supports configurable rules to accommodate different draft styl
 - [ ] Write unit tests for repositories
 
 ### Phase 2: Draft Logic & WebSockets (Weeks 2-3)
-- [ ] Design draft state machine
-- [ ] Create WebSocket server infrastructure
-- [ ] Implement draft room joining (single active draft)
-- [ ] Build turn management and timer logic
-- [ ] Real-time player selection sync
-- [ ] Prevent race conditions in concurrent picks
-- [ ] Auto-draft system:
-  - [ ] Random strategy implementation
-  - [ ] Auto-draft timeout configuration
-- [ ] Reconnection handling for dropped connections
-- [ ] Persist draft results to database
-- [ ] Update event status (not_started → in_progress → completed)
+- [x] Design draft state machine
+- [x] Create WebSocket server infrastructure
+- [x] Implement draft room joining (single active draft)
+- [x] Build turn management and timer logic
+- [x] Real-time player selection sync
+- [x] Prevent race conditions in concurrent picks
+- [x] Auto-draft system:
+  - [x] Random strategy implementation
+  - [x] Auto-draft timeout configuration
+- [x] Reconnection handling for dropped connections
+- [x] Persist draft results to database
+- [x] Update event status (not_started → in_progress → completed)
 - [ ] Integration testing for WebSocket flows
 
 ### Phase 3: Frontend Development (Weeks 3-4)
@@ -230,7 +230,7 @@ Each event/draft supports configurable rules to accommodate different draft styl
    - PostgreSQL-native driver with best performance
    - Full control over SQL queries (portfolio-worthy)
    - Excellent connection pooling and JSONB support
-3. **WebSocket Library:** nhooyr.io/websocket
+3. **WebSocket Library:** coder/websocket (formerly nhooyr.io/websocket)
    - Modern, context-based API
    - Active maintenance and better testing support
    - Production-grade (gorilla/websocket in maintenance mode)
@@ -279,4 +279,4 @@ Each event/draft supports configurable rules to accommodate different draft styl
 
 ---
 
-**Last Updated:** January 29, 2026
+**Last Updated:** February 3, 2026
