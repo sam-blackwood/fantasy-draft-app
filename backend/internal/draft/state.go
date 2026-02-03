@@ -20,12 +20,27 @@ const (
 
 // PickResult contains the details of a completed pick for persistence
 type PickResult struct {
-	EventID    int
-	UserID     int
-	PlayerID   int
-	PickNumber int
-	Round      int
-	AutoDraft  bool
+	EventID    int  `json:"eventID,omitempty"`
+	UserID     int  `json:"userID"`
+	PlayerID   int  `json:"playerID"`
+	PickNumber int  `json:"pickNumber"`
+	Round      int  `json:"round"`
+	AutoDraft  bool `json:"autoDraft"`
+}
+
+// DraftSnapshot captures the current state for client synchronization
+type DraftSnapshot struct {
+	EventID          int          `json:"eventID"`
+	Status           DraftStatus  `json:"status"`
+	CurrentTurn      int          `json:"currentTurn"`
+	RoundNumber      int          `json:"roundNumber"`
+	CurrentPickIndex int          `json:"currentPickIndex"`
+	TotalRounds      int          `json:"totalRounds"`
+	PickOrder        []int        `json:"pickOrder"`
+	AvailablePlayers []int        `json:"availablePlayers"`
+	TurnDeadline     int64        `json:"turnDeadline"`
+	RemainingTime    float64      `json:"remainingTime"`
+	PickHistory      []PickResult `json:"pickHistory"`
 }
 
 type DraftState struct {
@@ -45,6 +60,7 @@ type DraftState struct {
 	remainingTime    time.Duration   // Time remaining when paused (for resume)
 	totalRounds      int             // Total rounds in the draft (picks per team)
 	availablePlayers []int           // Player IDs available to draft
+	pickHistory      []PickResult    // All picks made in order (for reconnection sync)
 }
 
 func NewDraftState(eventID int) *DraftState {
@@ -127,8 +143,13 @@ func (d *DraftState) handleTimerExpired() {
 
 	randomIndex := rand.Intn(len(d.availablePlayers))
 	playerID := d.availablePlayers[randomIndex]
-	userID := d.currentTurnID
 
+	d.recordPick(d.currentTurnID, playerID, true)
+}
+
+// recordPick handles the common logic for recording a pick (manual or auto-draft)
+// Must be called while holding the mutex
+func (d *DraftState) recordPick(userID, playerID int, autoDraft bool) {
 	// Remove player from available list
 	d.removePlayer(playerID)
 
@@ -139,21 +160,24 @@ func (d *DraftState) handleTimerExpired() {
 		PlayerID:   playerID,
 		PickNumber: d.currentPickIndex + 1,
 		Round:      d.roundNumber,
-		AutoDraft:  true,
+		AutoDraft:  autoDraft,
 	}
 
-	// Emit auto-draft pick message
+	// Add to pick history for reconnection sync
+	d.pickHistory = append(d.pickHistory, pickResult)
+
+	// Emit pick made message
 	msg, _ := json.Marshal(map[string]interface{}{
 		"type":       MsgTypePickMade,
 		"userID":     userID,
 		"playerID":   playerID,
 		"pickNumber": pickResult.PickNumber,
 		"round":      d.roundNumber,
-		"autoDraft":  true,
+		"autoDraft":  autoDraft,
 	})
 	d.outgoing <- msg
 
-	// Emit pick result for persistence
+	// Send pick result for persistence
 	d.pickResults <- pickResult
 
 	// Move to next turn
@@ -226,21 +250,21 @@ func (d *DraftState) completeDraft() {
 }
 
 // MakePick processes a pick from a user
-// Returns pick details for persistence, or error if invalid
-func (d *DraftState) MakePick(userID, playerID int) (*PickResult, error) {
+// Returns error if invalid (not your turn, player unavailable, etc.)
+func (d *DraftState) MakePick(userID, playerID int) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
 	if d.draftStatus != StatusInProgress && d.draftStatus != StatusPaused {
-		return nil, fmt.Errorf("draft is not active")
+		return fmt.Errorf("draft is not active")
 	}
 
 	if userID != d.currentTurnID {
-		return nil, fmt.Errorf("not your turn")
+		return fmt.Errorf("not your turn")
 	}
 
 	if !d.isPlayerAvailable(playerID) {
-		return nil, fmt.Errorf("player not available")
+		return fmt.Errorf("player not available")
 	}
 
 	// Stop the current timer (pick was made in time)
@@ -253,37 +277,9 @@ func (d *DraftState) MakePick(userID, playerID int) (*PickResult, error) {
 		d.draftStatus = StatusInProgress
 	}
 
-	// Remove player from available list
-	d.removePlayer(playerID)
+	d.recordPick(userID, playerID, false)
 
-	// Create pick result (pick_number is 1-indexed)
-	pickResult := &PickResult{
-		EventID:    d.eventID,
-		UserID:     userID,
-		PlayerID:   playerID,
-		PickNumber: d.currentPickIndex + 1,
-		Round:      d.roundNumber,
-		AutoDraft:  false,
-	}
-
-	// Emit pick made message
-	msg, _ := json.Marshal(map[string]interface{}{
-		"type":       MsgTypePickMade,
-		"userID":     userID,
-		"playerID":   playerID,
-		"pickNumber": pickResult.PickNumber,
-		"round":      d.roundNumber,
-		"autoDraft":  false,
-	})
-	d.outgoing <- msg
-
-	// Emit pick result for persistence
-	d.pickResults <- *pickResult
-
-	// Move to next turn
-	d.advanceTurn()
-
-	return pickResult, nil
+	return nil
 }
 
 // PauseDraft pauses the draft, stopping the timer and saving remaining time
@@ -410,4 +406,43 @@ func (d *DraftState) GetAvailablePlayers() []int {
 // Completed returns a channel that is closed when the draft completes
 func (d *DraftState) Completed() <-chan struct{} {
 	return d.completed
+}
+
+// GetSnapshot returns a snapshot of the current draft state for client synchronization
+func (d *DraftState) GetSnapshot() DraftSnapshot {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+
+	// Calculate remaining time for paused state, or time until deadline for active state
+	var remainingTime float64
+	switch d.draftStatus {
+	case StatusPaused:
+		remainingTime = d.remainingTime.Seconds()
+	case StatusInProgress:
+		remainingTime = max(time.Until(d.turnDeadline).Seconds(), 0)
+	}
+
+	// Copy slices to avoid data races
+	pickOrder := make([]int, len(d.pickOrder))
+	copy(pickOrder, d.pickOrder)
+
+	availablePlayers := make([]int, len(d.availablePlayers))
+	copy(availablePlayers, d.availablePlayers)
+
+	pickHistory := make([]PickResult, len(d.pickHistory))
+	copy(pickHistory, d.pickHistory)
+
+	return DraftSnapshot{
+		EventID:          d.eventID,
+		Status:           d.draftStatus,
+		CurrentTurn:      d.currentTurnID,
+		RoundNumber:      d.roundNumber,
+		CurrentPickIndex: d.currentPickIndex,
+		TotalRounds:      d.totalRounds,
+		PickOrder:        pickOrder,
+		AvailablePlayers: availablePlayers,
+		TurnDeadline:     d.turnDeadline.Unix(),
+		RemainingTime:    remainingTime,
+		PickHistory:      pickHistory,
+	}
 }

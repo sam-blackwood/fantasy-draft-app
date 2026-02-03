@@ -106,7 +106,7 @@ func (s *DraftService) handleMakePick(c *Client, data []byte) {
 		return
 	}
 
-	if _, err := state.MakePick(msg.UserID, msg.PlayerID); err != nil {
+	if err := state.MakePick(msg.UserID, msg.PlayerID); err != nil {
 		c.SendError(err.Error())
 		return
 	}
