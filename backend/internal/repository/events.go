@@ -5,6 +5,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+
 	"github.com/sblackwood23/fantasy-draft-app/internal/models"
 )
 
@@ -136,6 +137,32 @@ func (r *EventRepository) Delete(ctx context.Context, id int) error {
 
 	commandTag, err := r.pool.Exec(ctx, query, id)
 
+	if err != nil {
+		return err
+	}
+
+	if commandTag.RowsAffected() == 0 {
+		return pgx.ErrNoRows
+	}
+
+	return nil
+}
+
+// UpdateStatus updates only the status field and corresponding timestamp
+// For "in_progress" status, sets started_at to now
+// For "completed" status, sets completed_at to now
+func (r *EventRepository) UpdateStatus(ctx context.Context, eventID int, status string) error {
+	var query string
+	switch status {
+	case models.EventStatusInProgress:
+		query = `UPDATE events SET status = $1, started_at = NOW() WHERE id = $2`
+	case models.EventStatusCompleted:
+		query = `UPDATE events SET status = $1, completed_at = NOW() WHERE id = $2`
+	default:
+		query = `UPDATE events SET status = $1 WHERE id = $2`
+	}
+
+	commandTag, err := r.pool.Exec(ctx, query, status, eventID)
 	if err != nil {
 		return err
 	}

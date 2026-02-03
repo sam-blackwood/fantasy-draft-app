@@ -15,19 +15,26 @@ type PickSaver interface {
 	SavePick(ctx context.Context, eventID, userID, playerID, pickNumber, round int) error
 }
 
+// EventUpdater defines the interface for updating event status
+type EventUpdater interface {
+	UpdateStatus(ctx context.Context, eventID int, status string) error
+}
+
 // DraftService manages WebSocket connections and draft state
 type DraftService struct {
-	manager   *Manager
-	state     *DraftState
-	mu        sync.RWMutex // protects state
-	pickSaver PickSaver
+	manager      *Manager
+	state        *DraftState
+	mu           sync.RWMutex // protects state
+	pickSaver    PickSaver
+	eventUpdater EventUpdater
 }
 
 // NewDraftService creates a new DraftService and starts the manager
-func NewDraftService(pickSaver PickSaver) *DraftService {
+func NewDraftService(pickSaver PickSaver, eventUpdater EventUpdater) *DraftService {
 	s := &DraftService{
-		manager:   NewManager(),
-		pickSaver: pickSaver,
+		manager:      NewManager(),
+		pickSaver:    pickSaver,
+		eventUpdater: eventUpdater,
 	}
 	go s.manager.Run()
 	return s

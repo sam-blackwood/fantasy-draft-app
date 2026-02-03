@@ -36,6 +36,7 @@ type DraftState struct {
 	draftStatus      DraftStatus     // Status of the draft
 	outgoing         chan []byte     // Outgoing messages from the draft state
 	pickResults      chan PickResult // Channel for completed picks (for persistence)
+	completed        chan struct{}   // Closed when draft completes (signals DraftService)
 	pickOrder        []int           // Order of user IDs for drafting
 	currentPickIndex int             // Current position in pickOrder
 	timerDuration    time.Duration   // How long each user has to pick
@@ -50,6 +51,7 @@ func NewDraftState(eventID int) *DraftState {
 		draftStatus: StatusNotStarted,
 		outgoing:    make(chan []byte, 256),
 		pickResults: make(chan PickResult, 256),
+		completed:   make(chan struct{}),
 	}
 }
 
@@ -216,6 +218,9 @@ func (d *DraftState) completeDraft() {
 		"totalRounds": d.totalRounds,
 	})
 	d.outgoing <- msg
+
+	// Signal completion to DraftService
+	close(d.completed)
 }
 
 // MakePick processes a pick from a user
@@ -336,4 +341,9 @@ func (d *DraftState) GetAvailablePlayers() []int {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 	return d.availablePlayers
+}
+
+// Completed returns a channel that is closed when the draft completes
+func (d *DraftState) Completed() <-chan struct{} {
+	return d.completed
 }

@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"log"
 	"time"
+
+	"github.com/sblackwood23/fantasy-draft-app/internal/models"
 )
 
 // Incoming message types (from client)
@@ -56,13 +58,22 @@ func (s *DraftService) handleStartDraft(c *Client, data []byte) {
 	}
 	s.mu.Unlock()
 
+	// Update event status to in_progress
+	eventID := state.GetEventID()
+	if err := s.eventUpdater.UpdateStatus(context.Background(), eventID, models.EventStatusInProgress); err != nil {
+		log.Printf("Failed to update event status to in_progress: %v", err)
+	}
+
 	// Start the bridge goroutine to broadcast outgoing messages
 	go s.startOutgoingBridge(state)
 
 	// Start the persistence goroutine to save picks to database
 	go s.startPickPersistence(state)
 
-	log.Printf("Draft started for event %d", state.GetEventID())
+	// Start the completion handler to update event status when draft ends
+	go s.startCompletionHandler(state)
+
+	log.Printf("Draft started for event %d", eventID)
 }
 
 // handleMakePick processes a pick from a user
@@ -105,5 +116,16 @@ func (s *DraftService) startPickPersistence(state *DraftState) {
 			log.Printf("Persisted pick: event=%d user=%d player=%d pick#=%d round=%d auto=%v",
 				pick.EventID, pick.UserID, pick.PlayerID, pick.PickNumber, pick.Round, pick.AutoDraft)
 		}
+	}
+}
+
+// startCompletionHandler waits for the draft to complete and updates event status
+func (s *DraftService) startCompletionHandler(state *DraftState) {
+	<-state.Completed()
+	eventID := state.GetEventID()
+	if err := s.eventUpdater.UpdateStatus(context.Background(), eventID, models.EventStatusCompleted); err != nil {
+		log.Printf("Failed to update event status to completed: %v", err)
+	} else {
+		log.Printf("Event %d marked as completed", eventID)
 	}
 }

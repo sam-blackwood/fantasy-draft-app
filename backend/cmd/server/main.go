@@ -37,7 +37,7 @@ func main() {
 	draftResultRepo := repository.NewDraftResultRepository(db.Pool)
 
 	// Initialize services
-	draftService := draft.NewDraftService(draftResultRepo)
+	draftService := draft.NewDraftService(draftResultRepo, eventRepo)
 
 	// Initialize dependencies
 	deps := &Dependencies{

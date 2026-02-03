@@ -6,6 +6,13 @@ import (
 	"time"
 )
 
+// Event status constants
+const (
+	EventStatusNotStarted = "not_started"
+	EventStatusInProgress = "in_progress"
+	EventStatusCompleted  = "completed"
+)
+
 // Event represents a draft event with configuration
 type Event struct {
 	ID                 int              `json:"id"`
