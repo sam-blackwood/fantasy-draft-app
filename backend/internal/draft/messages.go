@@ -1,6 +1,7 @@
 package draft
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"time"
@@ -58,6 +59,9 @@ func (s *DraftService) handleStartDraft(c *Client, data []byte) {
 	// Start the bridge goroutine to broadcast outgoing messages
 	go s.startOutgoingBridge(state)
 
+	// Start the persistence goroutine to save picks to database
+	go s.startPickPersistence(state)
+
 	log.Printf("Draft started for event %d", state.GetEventID())
 }
 
@@ -78,7 +82,7 @@ func (s *DraftService) handleMakePick(c *Client, data []byte) {
 		return
 	}
 
-	if err := state.MakePick(msg.UserID, msg.PlayerID); err != nil {
+	if _, err := state.MakePick(msg.UserID, msg.PlayerID); err != nil {
 		c.SendError(err.Error())
 		return
 	}
@@ -88,5 +92,18 @@ func (s *DraftService) handleMakePick(c *Client, data []byte) {
 func (s *DraftService) startOutgoingBridge(state *DraftState) {
 	for msg := range state.Outgoing() {
 		s.manager.Broadcast(msg)
+	}
+}
+
+// startPickPersistence reads from the draft state's pick results channel and saves to database
+func (s *DraftService) startPickPersistence(state *DraftState) {
+	for pick := range state.PickResults() {
+		ctx := context.Background()
+		if err := s.pickSaver.SavePick(ctx, pick.EventID, pick.UserID, pick.PlayerID, pick.PickNumber, pick.Round); err != nil {
+			log.Printf("Failed to persist pick: %v", err)
+		} else {
+			log.Printf("Persisted pick: event=%d user=%d player=%d pick#=%d round=%d auto=%v",
+				pick.EventID, pick.UserID, pick.PlayerID, pick.PickNumber, pick.Round, pick.AutoDraft)
+		}
 	}
 }

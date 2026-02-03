@@ -17,20 +17,31 @@ const (
 	StatusCompleted  DraftStatus = "completed"
 )
 
+// PickResult contains the details of a completed pick for persistence
+type PickResult struct {
+	EventID    int
+	UserID     int
+	PlayerID   int
+	PickNumber int
+	Round      int
+	AutoDraft  bool
+}
+
 type DraftState struct {
-	mu               sync.Mutex    // Protects concurrent access to state
-	eventID          int           // ID of the event for which the draft is occurring
-	currentTurnID    int           // ID of the user whose turn it currently is
-	pickTimer        *time.Timer   // Stores the timer for a pick
-	roundNumber      int           // The number of what round it is
-	draftStatus      DraftStatus   // Status of the draft
-	outgoing         chan []byte   // Outgoing messages from the draft state
-	pickOrder        []int         // Order of user IDs for drafting
-	currentPickIndex int           // Current position in pickOrder
-	timerDuration    time.Duration // How long each user has to pick
-	turnDeadline     time.Time     // When the current turn expires (for client countdown)
-	totalRounds      int           // Total rounds in the draft (picks per team)
-	availablePlayers []int         // Player IDs available to draft
+	mu               sync.Mutex      // Protects concurrent access to state
+	eventID          int             // ID of the event for which the draft is occurring
+	currentTurnID    int             // ID of the user whose turn it currently is
+	pickTimer        *time.Timer     // Stores the timer for a pick
+	roundNumber      int             // The number of what round it is
+	draftStatus      DraftStatus     // Status of the draft
+	outgoing         chan []byte     // Outgoing messages from the draft state
+	pickResults      chan PickResult // Channel for completed picks (for persistence)
+	pickOrder        []int           // Order of user IDs for drafting
+	currentPickIndex int             // Current position in pickOrder
+	timerDuration    time.Duration   // How long each user has to pick
+	turnDeadline     time.Time       // When the current turn expires (for client countdown)
+	totalRounds      int             // Total rounds in the draft (picks per team)
+	availablePlayers []int           // Player IDs available to draft
 }
 
 func NewDraftState(eventID int) *DraftState {
@@ -38,6 +49,7 @@ func NewDraftState(eventID int) *DraftState {
 		eventID:     eventID,
 		draftStatus: StatusNotStarted,
 		outgoing:    make(chan []byte, 256),
+		pickResults: make(chan PickResult, 256),
 	}
 }
 
@@ -116,15 +128,29 @@ func (d *DraftState) handleTimerExpired() {
 	// Remove player from available list
 	d.removePlayer(playerID)
 
+	// Create pick result (pick_number is 1-indexed)
+	pickResult := PickResult{
+		EventID:    d.eventID,
+		UserID:     userID,
+		PlayerID:   playerID,
+		PickNumber: d.currentPickIndex + 1,
+		Round:      d.roundNumber,
+		AutoDraft:  true,
+	}
+
 	// Emit auto-draft pick message
 	msg, _ := json.Marshal(map[string]interface{}{
-		"type":      "pick_made",
-		"userID":    userID,
-		"playerID":  playerID,
-		"round":     d.roundNumber,
-		"autoDraft": true,
+		"type":       "pick_made",
+		"userID":     userID,
+		"playerID":   playerID,
+		"pickNumber": pickResult.PickNumber,
+		"round":      d.roundNumber,
+		"autoDraft":  true,
 	})
 	d.outgoing <- msg
+
+	// Emit pick result for persistence
+	d.pickResults <- pickResult
 
 	// Move to next turn
 	d.advanceTurn()
@@ -193,21 +219,21 @@ func (d *DraftState) completeDraft() {
 }
 
 // MakePick processes a pick from a user
-// Returns error if it's not their turn or draft isn't in progress
-func (d *DraftState) MakePick(userID, playerID int) error {
+// Returns pick details for persistence, or error if invalid
+func (d *DraftState) MakePick(userID, playerID int) (*PickResult, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
 	if d.draftStatus != StatusInProgress {
-		return fmt.Errorf("draft is not in progress")
+		return nil, fmt.Errorf("draft is not in progress")
 	}
 
 	if userID != d.currentTurnID {
-		return fmt.Errorf("not your turn")
+		return nil, fmt.Errorf("not your turn")
 	}
 
 	if !d.isPlayerAvailable(playerID) {
-		return fmt.Errorf("player not available")
+		return nil, fmt.Errorf("player not available")
 	}
 
 	// Stop the current timer (pick was made in time)
@@ -218,20 +244,34 @@ func (d *DraftState) MakePick(userID, playerID int) error {
 	// Remove player from available list
 	d.removePlayer(playerID)
 
+	// Create pick result (pick_number is 1-indexed)
+	pickResult := &PickResult{
+		EventID:    d.eventID,
+		UserID:     userID,
+		PlayerID:   playerID,
+		PickNumber: d.currentPickIndex + 1,
+		Round:      d.roundNumber,
+		AutoDraft:  false,
+	}
+
 	// Emit pick made message
 	msg, _ := json.Marshal(map[string]interface{}{
-		"type":      "pick_made",
-		"userID":    userID,
-		"playerID":  playerID,
-		"round":     d.roundNumber,
-		"autoDraft": false,
+		"type":       "pick_made",
+		"userID":     userID,
+		"playerID":   playerID,
+		"pickNumber": pickResult.PickNumber,
+		"round":      d.roundNumber,
+		"autoDraft":  false,
 	})
 	d.outgoing <- msg
+
+	// Emit pick result for persistence
+	d.pickResults <- *pickResult
 
 	// Move to next turn
 	d.advanceTurn()
 
-	return nil
+	return pickResult, nil
 }
 
 // isPlayerAvailable checks if a player is still available to draft
@@ -249,6 +289,11 @@ func (d *DraftState) removePlayer(playerID int) {
 // Outgoing returns the channel for reading outgoing messages
 func (d *DraftState) Outgoing() <-chan []byte {
 	return d.outgoing
+}
+
+// PickResults returns the channel for reading completed picks (for persistence)
+func (d *DraftState) PickResults() <-chan PickResult {
+	return d.pickResults
 }
 
 // GetCurrentTurn returns the user ID of the current turn

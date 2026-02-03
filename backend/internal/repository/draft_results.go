@@ -15,6 +15,12 @@ func NewDraftResultRepository(pool *pgxpool.Pool) *DraftResultRepository {
 	return &DraftResultRepository{pool: pool}
 }
 
+// SavePick inserts a pick into the database (implements draft.PickSaver interface)
+func (r *DraftResultRepository) SavePick(ctx context.Context, eventID, userID, playerID, pickNumber, round int) error {
+	_, err := r.Create(ctx, eventID, userID, playerID, pickNumber, round)
+	return err
+}
+
 // Create inserts a new draft result (pick) into the database
 func (r *DraftResultRepository) Create(ctx context.Context, eventID, userID, playerID, pickNumber, round int) (*models.DraftResult, error) {
 	query := `

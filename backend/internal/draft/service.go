@@ -10,17 +10,24 @@ import (
 	"github.com/coder/websocket"
 )
 
+// PickSaver defines the interface for persisting draft picks
+type PickSaver interface {
+	SavePick(ctx context.Context, eventID, userID, playerID, pickNumber, round int) error
+}
+
 // DraftService manages WebSocket connections and draft state
 type DraftService struct {
-	manager *Manager
-	state   *DraftState
-	mu      sync.RWMutex // protects state
+	manager   *Manager
+	state     *DraftState
+	mu        sync.RWMutex // protects state
+	pickSaver PickSaver
 }
 
 // NewDraftService creates a new DraftService and starts the manager
-func NewDraftService() *DraftService {
+func NewDraftService(pickSaver PickSaver) *DraftService {
 	s := &DraftService{
-		manager: NewManager(),
+		manager:   NewManager(),
+		pickSaver: pickSaver,
 	}
 	go s.manager.Run()
 	return s

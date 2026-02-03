@@ -34,9 +34,10 @@ func main() {
 	playerRepo := repository.NewPlayerRepository(db.Pool)
 	userRepo := repository.NewUserRepository(db.Pool)
 	eventPlayerRepo := repository.NewEventPlayerRepository(db.Pool)
+	draftResultRepo := repository.NewDraftResultRepository(db.Pool)
 
 	// Initialize services
-	draftService := draft.NewDraftService()
+	draftService := draft.NewDraftService(draftResultRepo)
 
 	// Initialize dependencies
 	deps := &Dependencies{
