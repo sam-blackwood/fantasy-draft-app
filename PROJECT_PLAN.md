@@ -80,8 +80,8 @@ Real-time fantasy draft application built as Portfolio Project #1 to demonstrate
 
 6. **Group Access**
    - Password-protected draft room
-   - No user accounts required
-   - Session management for reconnections
+   - No user accounts required - username as identity within a draft
+   - Reconnection via localStorage (same device) or re-entering username (cross-device)
 
 ### Explicitly Out of Scope for MVP
 - Score tracking/live scoring
@@ -124,6 +124,22 @@ Each event/draft supports configurable rules to accommodate different draft styl
 3. **Concurrency** - Prevent race conditions in draft selections
 4. **Draft Rule Validation** - Enforce event-specific configuration rules
 5. **Performance** - Sub-100ms response times for 12 concurrent users
+
+### User Identity & Session Management (Decided - Feb 5, 2026)
+No user accounts required - identity is managed per-draft via username:
+
+- **Joining a draft:** User enters room password + username
+- **Username uniqueness:** Enforced per draft (same username = same person)
+- **Reconnection (same device):** localStorage stores userId, auto-rejoins without re-entering username
+- **Reconnection (different device):** Enter same username to be recognized as existing participant
+- **User records:** One user record per username per draft (Option A: user = participant in specific draft)
+  - "Sam_Masters2026" and "Sam_Ryder2026" are separate DB records
+  - Tracking same person across drafts is out of scope for MVP
+
+This approach works because:
+- Draft room is password-protected (friends only, low impersonation risk)
+- No extra PINs or auth needed
+- Simple to implement: lookup before insert
 
 ---
 
@@ -286,4 +302,4 @@ Each event/draft supports configurable rules to accommodate different draft styl
 
 ---
 
-**Last Updated:** February 5, 2026
+**Last Updated:** February 5, 2026 (User Identity Decision)
