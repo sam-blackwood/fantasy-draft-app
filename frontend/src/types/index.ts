@@ -3,19 +3,19 @@
 export interface Event {
   id: number;
   name: string;
-  max_picks_per_team: number;
-  max_teams_per_player: number;
+  maxPicksPerTeam: number;
+  maxTeamsPerPlayer: number;
   stipulations: Record<string, unknown>;
   status: 'pending' | 'in_progress' | 'completed';
-  created_at: string;
-  started_at: string | null;
-  completed_at: string | null;
+  createdAt: string;
+  startedAt: string | null;
+  completedAt: string | null;
 }
 
 export interface Player {
   id: number;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   status: string;
   countryCode: string;
 }
@@ -24,7 +24,7 @@ export interface User {
   id: number;
   eventID: number;
   username: string;
-  created_at: string;
+  createdAt: string;
 }
 
 // Draft State
