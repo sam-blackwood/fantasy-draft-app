@@ -2,10 +2,25 @@ import type { Event, Player, User } from '../types';
 
 const API_BASE = 'http://localhost:8080';
 
-async function fetchJSON<T>(url: string): Promise<T> {
-  const response = await fetch(`${API_BASE}${url}`);
+interface FetchOptions {
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  body?: unknown;
+}
+
+async function fetchJSON<T>(url: string, options: FetchOptions = {}): Promise<T> {
+  const { method = 'GET', body } = options;
+
+  const response = await fetch(`${API_BASE}${url}`, {
+    method,
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    // Try to extract error message from JSON response
+    const errorBody = await response.json().catch(() => null);
+    const message = errorBody?.error || `HTTP ${response.status}: ${response.statusText}`;
+    throw new Error(message);
   }
   return response.json();
 }
@@ -32,4 +47,11 @@ export async function getUsers(): Promise<User[]> {
 
 export async function getUser(id: number): Promise<User> {
   return fetchJSON<User>(`/users/${id}`);
+}
+
+export async function joinDraft(teamName: string, passkey: string): Promise<User> {
+  return fetchJSON<User>(`/events/join`, {
+    method: 'POST',
+    body: { teamName, passkey },
+  });
 }
