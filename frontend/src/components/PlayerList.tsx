@@ -153,7 +153,6 @@ export function PlayerList() {
               <tr className="text-left text-gray-400 border-b border-gray-700">
                 <th className="pb-2">Name</th>
                 <th className="pb-2">Country</th>
-                <th className="pb-2">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -166,10 +165,10 @@ export function PlayerList() {
                   >
                     <td className="py-2">
                       {player.firstName} {player.lastName}
+                      {player.status === 'amateur' && <span className="ml-1 text-xs text-yellow-400">(a)</span>}
                       {isDrafted && <span className="ml-2 text-xs text-red-400">(drafted)</span>}
                     </td>
                     <td className="py-2">{player.countryCode}</td>
-                    <td className="py-2">{player.status}</td>
                   </tr>
                 );
               })}
