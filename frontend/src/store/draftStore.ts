@@ -16,7 +16,7 @@ interface DraftState {
   totalRounds: number;
   currentPickIndex: number;
   pickOrder: number[];
-  availablePlayerIDs: number[];
+  availablePlayerIDs: number[] | null;
   pickHistory: Pick[];
   turnDeadline: number | null;
   remainingTime: number;
@@ -40,7 +40,7 @@ const initialState = {
   totalRounds: 0,
   currentPickIndex: 0,
   pickOrder: [],
-  availablePlayerIDs: [],
+  availablePlayerIDs: null,
   pickHistory: [],
   turnDeadline: null,
   remainingTime: 0,
@@ -70,6 +70,7 @@ export const useDraftStore = create<DraftState>((set) => ({
         set({
           draftStatus: message.status === 'in_progress' ? 'in_progress'
                      : message.status === 'paused' ? 'paused'
+                     : message.status === 'not_started' ? 'idle'
                      : 'completed',
           eventID: message.eventID,
           currentTurn: message.currentTurn,
@@ -97,7 +98,7 @@ export const useDraftStore = create<DraftState>((set) => ({
               autoDraft: message.autoDraft,
             },
           ],
-          availablePlayerIDs: state.availablePlayerIDs.filter(
+          availablePlayerIDs: (state.availablePlayerIDs ?? []).filter(
             (id) => id !== message.playerID
           ),
         }));

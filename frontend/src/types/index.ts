@@ -117,7 +117,7 @@ export interface DraftResumedMessage {
 export interface DraftStateMessage {
   type: 'draft_state';
   eventID: number;
-  status: 'in_progress' | 'paused' | 'completed';
+  status: 'not_started' | 'in_progress' | 'paused' | 'completed';
   currentTurn: number;
   roundNumber: number;
   currentPickIndex: number;

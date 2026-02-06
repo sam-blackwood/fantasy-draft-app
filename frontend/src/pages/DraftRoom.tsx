@@ -33,7 +33,7 @@ export function DraftRoom() {
 
   // Initialize players for the given eventID
   useEffect(() => {
-    if (eventID !== null) {
+    if (eventID != null) {
       initializeEventPlayers(eventID)
     }
   }, [eventID, initializeEventPlayers])
