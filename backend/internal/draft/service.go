@@ -189,7 +189,7 @@ func (s *DraftService) sendStateToClient(c *Client) {
 
 	snapshot := state.GetSnapshot()
 	if snapshot.Status == StatusNotStarted {
-		return // Draft exists but hasn't started yet
+		return // Draft exists but hasn't been configured/started yet
 	}
 
 	msg, _ := json.Marshal(map[string]interface{}{
