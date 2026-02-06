@@ -21,6 +21,7 @@ type Event struct {
 	MaxTeamsPerPlayer  int              `json:"max_teams_per_player"`
 	Stipulations       Stipulations     `json:"stipulations"`
 	Status             string           `json:"status"`
+	Passkey            *string          `json:"passkey,omitempty"`
 	CreatedAt          time.Time        `json:"created_at"`
 	StartedAt          *time.Time       `json:"started_at,omitempty"`
 	CompletedAt        *time.Time       `json:"completed_at,omitempty"`

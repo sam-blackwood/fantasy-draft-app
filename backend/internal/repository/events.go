@@ -21,7 +21,7 @@ func NewEventRepository(pool *pgxpool.Pool) *EventRepository {
 func (r *EventRepository) GetByID(ctx context.Context, id int) (*models.Event, error) {
 	query := `
 		SELECT id, name, max_picks_per_team, max_teams_per_player,
-		       stipulations, status, created_at, started_at, completed_at
+		       stipulations, status, passkey, created_at, started_at, completed_at
 		FROM events
 		WHERE id = $1
 	`
@@ -34,6 +34,7 @@ func (r *EventRepository) GetByID(ctx context.Context, id int) (*models.Event, e
 		&event.MaxTeamsPerPlayer,
 		&event.Stipulations,
 		&event.Status,
+		&event.Passkey,
 		&event.CreatedAt,
 		&event.StartedAt,
 		&event.CompletedAt,
@@ -50,7 +51,7 @@ func (r *EventRepository) GetByID(ctx context.Context, id int) (*models.Event, e
 func (r *EventRepository) GetAll(ctx context.Context) ([]models.Event, error) {
 	query := `
 		SELECT id, name, max_picks_per_team, max_teams_per_player,
-		       stipulations, status, created_at, started_at, completed_at
+		       stipulations, status, passkey, created_at, started_at, completed_at
 		FROM events
 	`
 
@@ -70,6 +71,7 @@ func (r *EventRepository) GetAll(ctx context.Context) ([]models.Event, error) {
 			&event.MaxTeamsPerPlayer,
 			&event.Stipulations,
 			&event.Status,
+			&event.Passkey,
 			&event.CreatedAt,
 			&event.StartedAt,
 			&event.CompletedAt,
@@ -86,8 +88,8 @@ func (r *EventRepository) GetAll(ctx context.Context) ([]models.Event, error) {
 // Create new record in events table
 func (r *EventRepository) Create(ctx context.Context, event *models.Event) error {
 	query := `
-    INSERT INTO events (name, max_picks_per_team, max_teams_per_player, stipulations, status)
-    VALUES ($1, $2, $3, $4, $5)
+    INSERT INTO events (name, max_picks_per_team, max_teams_per_player, stipulations, status, passkey)
+    VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING id, created_at
 `
 	err := r.pool.QueryRow(ctx, query,
@@ -96,6 +98,7 @@ func (r *EventRepository) Create(ctx context.Context, event *models.Event) error
 		event.MaxTeamsPerPlayer,
 		event.Stipulations,
 		event.Status,
+		event.Passkey,
 	).Scan(&event.ID, &event.CreatedAt)
 
 	return err
@@ -104,8 +107,8 @@ func (r *EventRepository) Create(ctx context.Context, event *models.Event) error
 // Update record in events table
 func (r *EventRepository) Update(ctx context.Context, event *models.Event) error {
 	query := `
-		UPDATE events SET name=$1, max_picks_per_team=$2, max_teams_per_player=$3, stipulations=$4, status=$5
-		WHERE id=$6
+		UPDATE events SET name=$1, max_picks_per_team=$2, max_teams_per_player=$3, stipulations=$4, status=$5, passkey=$6
+		WHERE id=$7
 	`
 
 	commandTag, err := r.pool.Exec(ctx, query,
@@ -114,6 +117,7 @@ func (r *EventRepository) Update(ctx context.Context, event *models.Event) error
 		event.MaxTeamsPerPlayer,
 		event.Stipulations,
 		event.Status,
+		event.Passkey,
 		event.ID,
 	)
 
