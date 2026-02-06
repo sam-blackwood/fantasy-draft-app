@@ -40,25 +40,25 @@ func NewDraftRoomHandler(
 func (h *DraftRoomHandler) CreateDraftRoom(w http.ResponseWriter, r *http.Request) {
 	eventID, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		http.Error(w, `{"error": "invalid event ID"}`, http.StatusBadRequest)
+		http.Error(w, `{"error": "Invalid event ID"}`, http.StatusBadRequest)
 		return
 	}
 
 	// Get available players for this event from the database
 	playerIDs, err := h.eventPlayerRepo.GetPlayerIDsByEvent(r.Context(), eventID)
 	if err != nil {
-		http.Error(w, `{"error": "failed to get players"}`, http.StatusInternalServerError)
+		http.Error(w, `{"error": "Failed to get players"}`, http.StatusInternalServerError)
 		return
 	}
 
 	if len(playerIDs) == 0 {
-		http.Error(w, `{"error": "no players assigned to this event"}`, http.StatusBadRequest)
+		http.Error(w, `{"error": "No players assigned to this event"}`, http.StatusBadRequest)
 		return
 	}
 
 	// Delegate to draft handler to create the room
 	if err := h.draftService.CreateRoom(eventID, playerIDs); err != nil {
-		http.Error(w, `{"error": "failed to create draft room"}`, http.StatusInternalServerError)
+		http.Error(w, `{"error": "Failed to create draft room"}`, http.StatusInternalServerError)
 		return
 	}
 
@@ -76,13 +76,13 @@ func (h *DraftRoomHandler) CreateDraftRoom(w http.ResponseWriter, r *http.Reques
 func (h *DraftRoomHandler) GetDraftRoom(w http.ResponseWriter, r *http.Request) {
 	eventID, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		http.Error(w, `{"error": "invalid event ID"}`, http.StatusBadRequest)
+		http.Error(w, `{"error": "Invalid event ID"}`, http.StatusBadRequest)
 		return
 	}
 
 	room := h.draftService.GetRoom()
 	if room == nil || room.GetEventID() != eventID {
-		http.Error(w, `{"error": "no draft room for this event"}`, http.StatusNotFound)
+		http.Error(w, `{"error": "No draft room for this event"}`, http.StatusNotFound)
 		return
 	}
 
@@ -101,21 +101,21 @@ func (h *DraftRoomHandler) GetDraftRoom(w http.ResponseWriter, r *http.Request) 
 func (h *DraftRoomHandler) JoinEvent(w http.ResponseWriter, r *http.Request) {
 	// Parse request body
 	var req struct {
-		TeamName string `json:"team_name"`
+		TeamName string `json:"teamName"`
 		Passkey  string `json:"passkey"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, `{"error": "invalid JSON"}`, http.StatusBadRequest)
+		http.Error(w, `{"error": "Invalid JSON"}`, http.StatusBadRequest)
 		return
 	}
 
 	if req.TeamName == "" {
-		http.Error(w, `{"error": "team_name is required"}`, http.StatusBadRequest)
+		http.Error(w, `{"error": "Team Name is required"}`, http.StatusBadRequest)
 		return
 	}
 
 	if req.Passkey == "" {
-		http.Error(w, `{"error": "passkey is required"}`, http.StatusBadRequest)
+		http.Error(w, `{"error": "Passkey is required"}`, http.StatusBadRequest)
 		return
 	}
 
@@ -123,10 +123,10 @@ func (h *DraftRoomHandler) JoinEvent(w http.ResponseWriter, r *http.Request) {
 	event, err := h.eventRepo.GetByPasskey(r.Context(), req.Passkey)
 	if err != nil {
 		if err == pgx.ErrNoRows {
-			http.Error(w, `{"error": "invalid passkey"}`, http.StatusUnauthorized)
+			http.Error(w, `{"error": "Invalid Passkey"}`, http.StatusUnauthorized)
 			return
 		}
-		http.Error(w, `{"error": "internal server error"}`, http.StatusInternalServerError)
+		http.Error(w, `{"error": "Internal server error"}`, http.StatusInternalServerError)
 		return
 	}
 
@@ -141,7 +141,7 @@ func (h *DraftRoomHandler) JoinEvent(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != pgx.ErrNoRows {
-		http.Error(w, `{"error": "internal server error"}`, http.StatusInternalServerError)
+		http.Error(w, `{"error": "Internal server error"}`, http.StatusInternalServerError)
 		return
 	}
 
@@ -149,12 +149,12 @@ func (h *DraftRoomHandler) JoinEvent(w http.ResponseWriter, r *http.Request) {
 	const maxTeams = 12
 	count, err := h.userRepo.CountByEvent(r.Context(), event.ID)
 	if err != nil {
-		http.Error(w, `{"error": "internal server error"}`, http.StatusInternalServerError)
+		http.Error(w, `{"error": "Internal server error"}`, http.StatusInternalServerError)
 		return
 	}
 
 	if count >= maxTeams {
-		http.Error(w, `{"error": "draft room is full"}`, http.StatusConflict)
+		http.Error(w, `{"error": "Draft room is full"}`, http.StatusConflict)
 		return
 	}
 
@@ -164,7 +164,7 @@ func (h *DraftRoomHandler) JoinEvent(w http.ResponseWriter, r *http.Request) {
 		Username: req.TeamName,
 	}
 	if err := h.userRepo.Create(r.Context(), newUser); err != nil {
-		http.Error(w, `{"error": "failed to register team"}`, http.StatusInternalServerError)
+		http.Error(w, `{"error": "Failed to register team"}`, http.StatusInternalServerError)
 		return
 	}
 
