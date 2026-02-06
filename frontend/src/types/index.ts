@@ -22,6 +22,7 @@ export interface Player {
 
 export interface User {
   id: number;
+  eventID: number;
   username: string;
   created_at: string;
 }
