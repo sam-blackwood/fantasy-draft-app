@@ -18,7 +18,7 @@ func NewUserRepository(pool *pgxpool.Pool) *UserRepository {
 
 func (r *UserRepository) GetByID(ctx context.Context, id int) (*models.User, error) {
 	query := `
-		SELECT id, username, created_at
+		SELECT id, event_id, username, created_at
 		FROM users
 		WHERE id = $1
 	`
@@ -26,6 +26,7 @@ func (r *UserRepository) GetByID(ctx context.Context, id int) (*models.User, err
 	var user models.User
 	err := r.pool.QueryRow(ctx, query, id).Scan(
 		&user.ID,
+		&user.EventID,
 		&user.Username,
 		&user.CreatedAt,
 	)
@@ -40,7 +41,7 @@ func (r *UserRepository) GetByID(ctx context.Context, id int) (*models.User, err
 // Retrieves all users
 func (r *UserRepository) GetAll(ctx context.Context) ([]models.User, error) {
 	query := `
-		SELECT id, username, created_at
+		SELECT id, event_id, username, created_at
 		FROM users
 	`
 
@@ -55,6 +56,7 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]models.User, error) {
 		var user models.User
 		err := rows.Scan(
 			&user.ID,
+			&user.EventID,
 			&user.Username,
 			&user.CreatedAt,
 		)
@@ -70,11 +72,12 @@ func (r *UserRepository) GetAll(ctx context.Context) ([]models.User, error) {
 // Create new record in users table
 func (r *UserRepository) Create(ctx context.Context, user *models.User) error {
 	query := `
-		INSERT INTO users (username)
-		VALUES ($1)
+		INSERT INTO users (event_id, username)
+		VALUES ($1, $2)
 		RETURNING id, created_at
 	`
 	err := r.pool.QueryRow(ctx, query,
+		user.EventID,
 		user.Username,
 	).Scan(&user.ID, &user.CreatedAt)
 
@@ -122,4 +125,40 @@ func (r *UserRepository) Delete(ctx context.Context, id int) error {
 	}
 
 	return nil
+}
+
+// GetByEventAndUsername finds a user by event ID and username
+func (r *UserRepository) GetByEventAndUsername(ctx context.Context, eventID int, username string) (*models.User, error) {
+	query := `
+		SELECT id, event_id, username, created_at
+		FROM users
+		WHERE event_id = $1 AND username = $2
+	`
+
+	var user models.User
+	err := r.pool.QueryRow(ctx, query, eventID, username).Scan(
+		&user.ID,
+		&user.EventID,
+		&user.Username,
+		&user.CreatedAt,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+// CountByEvent returns the number of users registered for an event
+func (r *UserRepository) CountByEvent(ctx context.Context, eventID int) (int, error) {
+	query := `SELECT COUNT(*) FROM users WHERE event_id = $1`
+
+	var count int
+	err := r.pool.QueryRow(ctx, query, eventID).Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
 }
