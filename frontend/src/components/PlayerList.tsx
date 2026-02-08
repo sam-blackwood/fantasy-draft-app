@@ -221,13 +221,13 @@ export function PlayerList() {
             <thead className="sticky top-0 bg-gray-800">
               <tr className="text-left text-gray-400 border-b border-gray-700">
                 <th className="pb-2">
-                  <button onClick={() => toggleSort('name')} className="relative hover:text-white">
+                  <button onClick={() => toggleSort('name')} className="relative hover:text-white cursor-pointer">
                     Name
                     {sortConfig?.sortField === 'name' && <span className="absolute -right-3 top-1/2 -translate-y-1/2 text-[10px] text-blue-400">{sortConfig.sortDirection === 'asc' ? '\u25B2' : '\u25BC'}</span>}
                   </button>
                 </th>
                 <th className="pb-2">
-                  <button onClick={() => toggleSort('countryCode')} className="relative hover:text-white">
+                  <button onClick={() => toggleSort('countryCode')} className="relative hover:text-white cursor-pointer">
                     Country
                     {sortConfig?.sortField === 'countryCode' && <span className="absolute -right-3 top-1/2 -translate-y-1/2 text-[10px] text-blue-400">{sortConfig.sortDirection === 'asc' ? '\u25B2' : '\u25BC'}</span>}
                   </button>
