@@ -176,7 +176,7 @@ This approach works because:
 - [x] Set up React project with Vite
 - [x] Create basic routing and layout
 - [x] Draft room UI with WebSocket connection
-- [ ] Player board with search/filter/sort
+- [x] Player board with search/filter/sort
 - [ ] Team roster display (live updates)
 - [ ] Draft timer and turn indicator
 - [ ] Real-time updates when players are drafted
