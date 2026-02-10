@@ -6,6 +6,7 @@ import { useLocalStore } from '../store/localStore';
 export function JoinPage() {
   const navigate = useNavigate();
   const setEventID = useLocalStore((state) => state.setEventID);
+  const setUserID = useLocalStore((state) => state.setUserID);
   const [teamName, setTeamName] = useState<string>('');
   const [passKey, setPassKey] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
@@ -16,8 +17,8 @@ export function JoinPage() {
     setError(null);
     joinDraft(teamName, passKey)
       .then((user) => {
-        // Set eventID so we can initialize event players when setting up the draft room
         setEventID(user.eventID);
+        setUserID(user.id);
         navigate('/draft');
       })
       .catch((err: Error) => setError(err.message || 'Failed to join draft'));

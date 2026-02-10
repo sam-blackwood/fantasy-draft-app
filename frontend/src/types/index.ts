@@ -137,6 +137,17 @@ export interface DraftStateMessage {
   turnDeadline: number;
   remainingTime: number;
   pickHistory: Pick[];
+  connectedUserIDs: number[];
+}
+
+export interface UserJoinedMessage {
+  type: 'user_joined';
+  userID: number;
+}
+
+export interface UserLeftMessage {
+  type: 'user_left';
+  userID: number;
 }
 
 export interface ErrorMessage {
@@ -152,4 +163,6 @@ export type ServerMessage =
   | DraftPausedMessage
   | DraftResumedMessage
   | DraftStateMessage
+  | UserJoinedMessage
+  | UserLeftMessage
   | ErrorMessage;

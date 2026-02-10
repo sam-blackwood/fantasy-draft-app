@@ -1,18 +1,17 @@
 import { useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { useDraftStore } from '../store/draftStore';
 import { useLocalStore } from '../store/localStore';
 import { usePlayerStore } from '../store/playerStore';
+import { getUsers } from '../api/client';
 import { PlayerList } from '../components/PlayerList';
+import { DraftOrder } from '../components/DraftOrder';
 
 export function DraftRoom() {
-  // URL query params
-  const [searchParams] = useSearchParams();
-  const userId = Number(searchParams.get('userId'));
+  const userID = useLocalStore((s) => s.userID);
 
   // Custom hook - WebSocket connection methods
-  const { connect, disconnect } = useWebSocket();
+  const { connect, disconnect } = useWebSocket(userID);
 
   // Zustand store selectors - each subscribes to a slice of global state
   const connectionStatus = useDraftStore((s) => s.connectionStatus);
@@ -25,12 +24,18 @@ export function DraftRoom() {
   const turnDeadline = useDraftStore((s) => s.turnDeadline);
 
   const initializeEventPlayers = usePlayerStore((s) => s.setEventPlayers);
+  const setRegisteredUsers = useDraftStore((s) => s.setRegisteredUsers);
 
-  // Effect: connect WebSocket on mount, disconnect on unmount
+  // Fetch registered users then connect WebSocket
   useEffect(() => {
-    connect();
-    return () => disconnect(); // cleanup function
-  }, [connect, disconnect]);
+    getUsers()
+      .then((users) => {
+        setRegisteredUsers(users);
+        connect();
+      })
+      .catch((err) => console.error('Failed to fetch users:', err));
+    return () => disconnect();
+  }, [connect, disconnect, setRegisteredUsers]);
 
   // Initialize players for the given eventID
   useEffect(() => {
@@ -40,7 +45,7 @@ export function DraftRoom() {
   }, [eventID, initializeEventPlayers])
 
   // Computed value - derived from state, recalculates each render
-  const isMyTurn = currentTurn === userId;
+  const isMyTurn = currentTurn === userID;
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
@@ -48,6 +53,11 @@ export function DraftRoom() {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Draft Room</h1>
+        </div>
+
+        {/* Draft Order */}
+        <div className="mb-4">
+          <DraftOrder />
         </div>
 
         {/* Connection Status */}
@@ -70,7 +80,7 @@ export function DraftRoom() {
                 : 'Disconnected'}
             </span>
           </div>
-          <p className="text-xs text-gray-400 mt-1">Your User ID: {userId}</p>
+          <p className="text-xs text-gray-400 mt-1">Your User ID: {userID}</p>
         </div>
 
         {/* Error Display */}

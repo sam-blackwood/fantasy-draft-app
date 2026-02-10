@@ -1,10 +1,10 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useDraftStore } from '../store/draftStore';
 import type { ClientMessage, ServerMessage } from '../types';
 
-const WS_URL = 'ws://localhost:8080/ws/draft';
+const WS_BASE_URL = 'ws://localhost:8080/ws/draft';
 
-export function useWebSocket() {
+export function useWebSocket(userID: number | null) {
   const wsRef = useRef<WebSocket | null>(null);
   const setConnectionStatus = useDraftStore((s) => s.setConnectionStatus);
   const handleServerMessage = useDraftStore((s) => s.handleServerMessage);
@@ -14,8 +14,13 @@ export function useWebSocket() {
       return;
     }
 
+    if (userID == null) {
+      console.error('Cannot connect WebSocket: userID is not set');
+      return;
+    }
+
     setConnectionStatus('connecting');
-    const ws = new WebSocket(WS_URL);
+    const ws = new WebSocket(`${WS_BASE_URL}?userID=${userID}`);
 
     ws.onopen = () => {
       setConnectionStatus('connected');
@@ -40,7 +45,7 @@ export function useWebSocket() {
     };
 
     wsRef.current = ws;
-  }, [setConnectionStatus, handleServerMessage]);
+  }, [userID, setConnectionStatus, handleServerMessage]);
 
   const disconnect = useCallback(() => {
     if (wsRef.current) {

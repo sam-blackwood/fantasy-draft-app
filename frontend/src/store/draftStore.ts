@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Pick, ServerMessage } from '../types';
+import type { Pick, ServerMessage, User } from '../types';
 
 type ConnectionStatus = 'disconnected' | 'connecting' | 'connected';
 type DraftStatus = 'idle' | 'in_progress' | 'paused' | 'completed';
@@ -20,11 +20,16 @@ interface DraftState {
   turnDeadline: number | null;
   remainingTime: number;
 
+  // Users
+  connectedUsers: User[];
+  registeredUsers: User[];
+
   // Error
   lastError: string | null;
 
   // Actions
   setConnectionStatus: (status: ConnectionStatus) => void;
+  setRegisteredUsers: (users: User[]) => void;
   handleServerMessage: (message: ServerMessage) => void;
   reset: () => void;
 }
@@ -41,6 +46,8 @@ const initialState = {
   pickHistory: [],
   turnDeadline: null,
   remainingTime: 0,
+  connectedUsers: [] as User[],
+  registeredUsers: [] as User[],
   lastError: null,
 };
 
@@ -48,6 +55,7 @@ export const useDraftStore = create<DraftState>((set) => ({
   ...initialState,
 
   setConnectionStatus: (status) => set({ connectionStatus: status }),
+  setRegisteredUsers: (users) => set({ registeredUsers: users }),
 
   handleServerMessage: (message) => {
     switch (message.type) {
@@ -62,7 +70,7 @@ export const useDraftStore = create<DraftState>((set) => ({
         break;
 
       case 'draft_state':
-        set({
+        set((state) => ({
           draftStatus: message.status === 'in_progress' ? 'in_progress'
                      : message.status === 'paused' ? 'paused'
                      : message.status === 'not_started' ? 'idle'
@@ -76,8 +84,11 @@ export const useDraftStore = create<DraftState>((set) => ({
           pickHistory: message.pickHistory,
           turnDeadline: message.turnDeadline,
           remainingTime: message.remainingTime,
+          connectedUsers: state.registeredUsers.filter(
+            (u) => message.connectedUserIDs.includes(u.id)
+          ),
           lastError: null,
-        });
+        }));
         break;
 
       case 'pick_made':
@@ -127,6 +138,27 @@ export const useDraftStore = create<DraftState>((set) => ({
           roundNumber: message.roundNumber,
           turnDeadline: message.turnDeadline,
         });
+        break;
+
+      case 'user_joined':
+        set((state) => {
+          // Don't update state if user already is in the draft (e.g., already joined from another browser tab)
+          if (state.connectedUsers.some((u) => u.id === message.userID)) {
+            return state;
+          }
+          const user = state.registeredUsers.find((u) => u.id === message.userID);
+          return user
+            ? { connectedUsers: [...state.connectedUsers, user] }
+            : state;
+        });
+        break;
+
+      case 'user_left':
+        set((state) => ({
+          connectedUsers: state.connectedUsers.filter(
+            (u) => u.id !== message.userID
+          ),
+        }));
         break;
 
       case 'error':
