@@ -27,6 +27,8 @@ const (
 	MsgTypePickMade       = "pick_made"
 	MsgTypeTurnChanged    = "turn_changed"
 	MsgTypeError          = "error"
+	MsgTypeUserJoined     = "user_joined"
+	MsgTypeUserLeft       = "user_left"
 )
 
 // StartDraftMessage represents the payload for starting a draft

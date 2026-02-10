@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"sync"
 
 	"github.com/coder/websocket"
@@ -58,8 +59,9 @@ func (s *DraftService) GetRoom() *DraftState {
 
 // Client represents a WebSocket client connection
 type Client struct {
-	Conn *websocket.Conn
-	Send chan []byte // Buffered channel for outgoing messages
+	Conn   *websocket.Conn
+	Send   chan []byte // Buffered channel for outgoing messages
+	UserID int
 }
 
 // SendError sends an error message to this client
@@ -73,6 +75,18 @@ func (c *Client) SendError(message string) {
 
 // HandleWebSocket upgrades HTTP connection to WebSocket and handles messages
 func (s *DraftService) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
+	// Parse userID from query parameter before upgrading connection
+	userIDStr := r.URL.Query().Get("userID")
+	if userIDStr == "" {
+		http.Error(w, "userID query parameter is required", http.StatusBadRequest)
+		return
+	}
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil || userID <= 0 {
+		http.Error(w, "userID must be a positive integer", http.StatusBadRequest)
+		return
+	}
+
 	// Upgrade HTTP connection to WebSocket
 	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
 		// Allow all origins for development (file:// and localhost)
@@ -85,12 +99,13 @@ func (s *DraftService) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("WebSocket connection established")
+	log.Printf("WebSocket connection established (userID: %d)", userID)
 
 	// Create client
 	client := &Client{
-		Conn: conn,
-		Send: make(chan []byte, 256), // Buffered channel
+		Conn:   conn,
+		Send:   make(chan []byte, 256), // Buffered channel
+		UserID: userID,
 	}
 	// Register client with the draft manager
 	s.manager.Register(client)
@@ -205,6 +220,7 @@ func (s *DraftService) sendStateToClient(c *Client) {
 		"turnDeadline":     snapshot.TurnDeadline,
 		"remainingTime":    snapshot.RemainingTime,
 		"pickHistory":      snapshot.PickHistory,
+		"connectedUserIDs": s.manager.GetConnectedUserIDs(),
 	})
 	c.Send <- msg
 	log.Printf("Sent draft state to reconnecting client (status: %s)", snapshot.Status)
