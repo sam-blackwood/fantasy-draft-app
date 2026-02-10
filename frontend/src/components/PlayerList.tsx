@@ -240,7 +240,7 @@ export function PlayerList() {
                 return (
                   <tr
                     key={player.id}
-                    className={`border-b border-gray-700/50 ${isDrafted ? 'opacity-40' : ''}`}
+                    className={`border-b border-gray-700/50 odd:bg-gray-700/30 ${isDrafted ? 'opacity-40' : ''}`}
                   >
                     <td className="py-2">
                       {player.firstName} {player.lastName}
