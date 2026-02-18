@@ -22,6 +22,8 @@ export function DraftRoom() {
   const pickHistory = useDraftStore((s) => s.pickHistory);
   const lastError = useDraftStore((s) => s.lastError);
   const turnDeadline = useDraftStore((s) => s.turnDeadline);
+  const connectedUsers = useDraftStore((s) => s.connectedUsers);
+  const registeredUsers = useDraftStore((s) => s.registeredUsers);
 
   const initializeEventPlayers = usePlayerStore((s) => s.setEventPlayers);
   const setRegisteredUsers = useDraftStore((s) => s.setRegisteredUsers);
@@ -44,8 +46,10 @@ export function DraftRoom() {
     }
   }, [eventID, initializeEventPlayers])
 
-  // Computed value - derived from state, recalculates each render
+  // Computed values
   const isMyTurn = currentTurn === userID;
+  const isPreDraft = draftStatus === 'idle';
+  const myUsername = registeredUsers.find((u) => u.id === userID)?.username;
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
@@ -53,11 +57,6 @@ export function DraftRoom() {
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Draft Room</h1>
-        </div>
-
-        {/* Draft Order */}
-        <div className="mb-4">
-          <DraftOrder />
         </div>
 
         {/* Connection Status */}
@@ -80,7 +79,9 @@ export function DraftRoom() {
                 : 'Disconnected'}
             </span>
           </div>
-          <p className="text-xs text-gray-400 mt-1">Your User ID: {userID}</p>
+          <p className="text-xs text-gray-400 mt-1">
+            {myUsername ? `Connected as ${myUsername} (ID: ${userID})` : `User ID: ${userID}`}
+          </p>
         </div>
 
         {/* Error Display */}
@@ -90,57 +91,97 @@ export function DraftRoom() {
           </div>
         )}
 
-        {/* Draft Status */}
-        <div className="mb-4 p-4 bg-gray-800 rounded">
-          <h2 className="font-semibold mb-2">Draft Status</h2>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div>Status: <span className="text-blue-400">{draftStatus}</span></div>
-            <div>Round: <span className="text-blue-400">{roundNumber}</span></div>
-            <div>Current Turn: <span className="text-blue-400">{currentTurn ?? 'N/A'}</span></div>
-            <div>
-              {isMyTurn ? (
-                <span className="text-green-400 font-bold">YOUR TURN!</span>
-              ) : (
-                <span className="text-gray-400">Waiting...</span>
+        {isPreDraft ? (
+          <>
+            {/* Waiting Banner */}
+            <div className="mb-4 p-8 bg-gray-800 rounded text-center">
+              <h2 className="text-xl font-semibold mb-2">Waiting for draft to start...</h2>
+              <p className="text-gray-400 text-sm">
+                The draft admin will start the draft once everyone is ready.
+              </p>
+            </div>
+
+            {/* Users */}
+            <div className="mb-4 p-4 bg-gray-800 rounded">
+              <h2 className="font-semibold mb-2">Users</h2>
+              <div className="space-y-1 text-sm">
+                {registeredUsers.map((user) => {
+                  const isMe = user.id === userID;
+                  const isConnected = isMe || connectedUsers.some((u) => u.id === user.id);
+                  return (
+                    <div key={user.id} className="flex items-center gap-2">
+                      <span className={isConnected ? 'text-white' : 'text-gray-500'}>
+                        {user.username}
+                      </span>
+                      <span className={`text-xs ${isMe ? 'text-blue-400' : isConnected ? 'text-green-400' : 'text-gray-500'}`}>
+                        ({isMe ? 'You' : isConnected ? 'Active' : 'Inactive'})
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Draft Order */}
+            <div className="mb-4">
+              <DraftOrder />
+            </div>
+
+            {/* Draft Status */}
+            <div className="mb-4 p-4 bg-gray-800 rounded">
+              <h2 className="font-semibold mb-2">Draft Status</h2>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div>Status: <span className="text-blue-400">{draftStatus}</span></div>
+                <div>Round: <span className="text-blue-400">{roundNumber}</span></div>
+                <div>Current Turn: <span className="text-blue-400">{currentTurn ?? 'N/A'}</span></div>
+                <div>
+                  {isMyTurn ? (
+                    <span className="text-green-400 font-bold">YOUR TURN!</span>
+                  ) : (
+                    <span className="text-gray-400">Waiting...</span>
+                  )}
+                </div>
+              </div>
+              {turnDeadline && (
+                <div className="mt-2 text-xs text-gray-400">
+                  Turn deadline: {new Date(turnDeadline * 1000).toLocaleTimeString()}
+                </div>
               )}
             </div>
-          </div>
-          {turnDeadline && (
-            <div className="mt-2 text-xs text-gray-400">
-              Turn deadline: {new Date(turnDeadline * 1000).toLocaleTimeString()}
+
+            {/* Pick History */}
+            <div className="mb-4 p-4 bg-gray-800 rounded">
+              <h2 className="font-semibold mb-2">
+                Pick History ({pickHistory.length})
+              </h2>
+              {pickHistory.length === 0 ? (
+                <p className="text-gray-400 text-sm">No picks yet.</p>
+              ) : (
+                <div className="space-y-1 text-sm max-h-48 overflow-y-auto">
+                  {pickHistory.map((pick, i) => (
+                    <div key={i} className="flex justify-between">
+                      <span>
+                        #{pick.pickNumber} - User {pick.userID} picked Player {pick.playerID}
+                      </span>
+                      <span className="text-gray-400">
+                        Round {pick.round}
+                        {pick.autoDraft && (
+                          <span className="text-yellow-500 ml-2">(auto)</span>
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </>
+        )}
 
         {/* Player List */}
         <div className="mb-4">
           <PlayerList />
-        </div>
-
-        {/* Pick History */}
-        <div className="p-4 bg-gray-800 rounded">
-          <h2 className="font-semibold mb-2">
-            Pick History ({pickHistory.length})
-          </h2>
-          {pickHistory.length === 0 ? (
-            <p className="text-gray-400 text-sm">No picks yet.</p>
-          ) : (
-            <div className="space-y-1 text-sm max-h-48 overflow-y-auto">
-              {pickHistory.map((pick, i) => (
-                <div key={i} className="flex justify-between">
-                  <span>
-                    #{pick.pickNumber} - User {pick.userID} picked Player {pick.playerID}
-                  </span>
-                  <span className="text-gray-400">
-                    Round {pick.round}
-                    {pick.autoDraft && (
-                      <span className="text-yellow-500 ml-2">(auto)</span>
-                    )}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Debug: Raw State */}
