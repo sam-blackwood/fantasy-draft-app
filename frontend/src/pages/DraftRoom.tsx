@@ -1,17 +1,20 @@
 import { useEffect } from 'react';
+import { getUsers } from '../api/client';
+import { DraftOrder } from '../components/DraftOrder';
+import { PlayerList } from '../components/PlayerList';
+import { useDraftAdmin } from '../hooks/useDraftAdmin';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { useDraftStore } from '../store/draftStore';
 import { useLocalStore } from '../store/localStore';
 import { usePlayerStore } from '../store/playerStore';
-import { getUsers } from '../api/client';
-import { PlayerList } from '../components/PlayerList';
-import { DraftOrder } from '../components/DraftOrder';
 
 export function DraftRoom() {
   const userID = useLocalStore((s) => s.userID);
 
   // Custom hook - WebSocket connection methods
-  const { connect, disconnect } = useWebSocket(userID);
+  const { connect, disconnect, sendMessage } = useWebSocket(userID);
+  // Setup the console API for the admin
+  useDraftAdmin(sendMessage);
 
   // Zustand store selectors - each subscribes to a slice of global state
   const connectionStatus = useDraftStore((s) => s.connectionStatus);
@@ -63,20 +66,19 @@ export function DraftRoom() {
         <div className="mb-4 p-3 bg-gray-800 rounded">
           <div className="flex items-center gap-2">
             <span
-              className={`w-3 h-3 rounded-full ${
-                connectionStatus === 'connected'
+              className={`w-3 h-3 rounded-full ${connectionStatus === 'connected'
                   ? 'bg-green-500'
                   : connectionStatus === 'connecting'
-                  ? 'bg-yellow-500'
-                  : 'bg-red-500'
-              }`}
+                    ? 'bg-yellow-500'
+                    : 'bg-red-500'
+                }`}
             />
             <span className="text-sm">
               {connectionStatus === 'connected'
                 ? 'Connected'
                 : connectionStatus === 'connecting'
-                ? 'Connecting...'
-                : 'Disconnected'}
+                  ? 'Connecting...'
+                  : 'Disconnected'}
             </span>
           </div>
           <p className="text-xs text-gray-400 mt-1">
