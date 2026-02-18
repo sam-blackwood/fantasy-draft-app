@@ -63,14 +63,19 @@ Real-time fantasy draft application built as Portfolio Project #1 to demonstrate
    - Real-time updates when players are drafted
    - Support for draft stipulations (e.g., "must draft an amateur", "must draft someone from outside US")
 
-4. **Event Setup** (via local scripts)
+4. **Event Setup & Admin Controls** (via seed scripts + browser console API)
    - Seed data scripts to create events
    - Configure player pool via seed scripts
    - Configure draft settings:
      - Number of teams and draft timer duration
      - Max picks per team (e.g., 6 players)
      - Max teams that can draft the same player (1 for traditional, 2+ for Ryder Cup style)
-   - Start/pause/reset drafts via API
+   - **Browser console admin API (`window.draftAdmin`)** for real-time draft control:
+     - `startDraft(pickOrder, totalRounds, timerDuration)` — set draft order and start
+     - `pause()` / `resume()` — control draft flow
+     - `makePick(userID, playerID)` — force picks for absent users
+     - `status()` / `users()` — inspect draft state
+   - No admin UI for MVP — admin (the developer) uses the console API from the draft room page
    - View draft results
 
 5. **Auto-Draft Support**
@@ -86,6 +91,7 @@ Real-time fantasy draft application built as Portfolio Project #1 to demonstrate
 ### Explicitly Out of Scope for MVP
 - Score tracking/live scoring
 - User accounts/authentication system
+- Admin UI (draft order setup, start/pause controls) — handled via console API for now
 - Mobile apps
 - League management across multiple events
 - Historical statistics/analytics
@@ -177,6 +183,8 @@ This approach works because:
 - [x] Create basic routing and layout
 - [x] Draft room UI with WebSocket connection
 - [x] Player board with search/filter/sort
+- [x] Pre-draft lobby (waiting state with connected user list)
+- [x] Console admin API for draft control (`useDraftAdmin` hook)
 - [ ] Team roster display (live updates)
 - [ ] Draft timer and turn indicator
 - [ ] Real-time updates when players are drafted
@@ -302,4 +310,4 @@ This approach works because:
 
 ---
 
-**Last Updated:** February 5, 2026 (User Identity Decision)
+**Last Updated:** February 18, 2026 (Console Admin API, Pre-Draft Lobby)
