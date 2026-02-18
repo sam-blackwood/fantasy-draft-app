@@ -43,6 +43,24 @@ func (m *Manager) Run() {
 			m.clients[client] = true
 			log.Printf("Connected new client (userID: %d)", client.UserID)
 
+			// Send user_joined for all already-connected users to the new client
+			// so their lobby shows who's already in the room.
+			seen := make(map[int]bool)
+			for c := range m.clients {
+				if c == client || seen[c.UserID] {
+					continue
+				}
+				seen[c.UserID] = true
+				existingMsg, _ := json.Marshal(map[string]interface{}{
+					"type":   MsgTypeUserJoined,
+					"userID": c.UserID,
+				})
+				select {
+				case client.Send <- existingMsg:
+				default:
+				}
+			}
+
 			// Only broadcast user_joined if this is the first connection for this userID
 			if !alreadyConnected {
 				joinMsg, _ := json.Marshal(map[string]interface{}{
