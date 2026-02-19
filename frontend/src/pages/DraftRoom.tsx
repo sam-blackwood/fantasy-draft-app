@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { getUsers } from '../api/client';
 import { DraftOrder } from '../components/DraftOrder';
 import { DraftResults } from '../components/DraftResults';
+import { DraftTimer } from '../components/DraftTimer';
 import { PlayerList } from '../components/PlayerList';
 import { TeamRoster } from '../components/TeamRoster';
 import { useDraftAdmin } from '../hooks/useDraftAdmin';
@@ -22,10 +23,8 @@ export function DraftRoom() {
   const connectionStatus = useDraftStore((s) => s.connectionStatus);
   const eventID = useLocalStore((s) => s.eventID);
   const draftStatus = useDraftStore((s) => s.draftStatus);
-  const currentTurn = useDraftStore((s) => s.currentTurn);
   const roundNumber = useDraftStore((s) => s.roundNumber);
   const lastError = useDraftStore((s) => s.lastError);
-  const turnDeadline = useDraftStore((s) => s.turnDeadline);
   const connectedUsers = useDraftStore((s) => s.connectedUsers);
   const registeredUsers = useDraftStore((s) => s.registeredUsers);
 
@@ -51,9 +50,15 @@ export function DraftRoom() {
   }, [eventID, initializeEventPlayers])
 
   // Computed values
-  const isMyTurn = currentTurn === userID;
   const isPreDraft = draftStatus === 'idle';
+  const isDraftComplete = draftStatus === 'completed';
   const myUsername = registeredUsers.find((u) => u.id === userID)?.username;
+
+  function pickPlayer(playerID: number) {
+    if (userID != null) {
+      sendMessage({ type: 'make_pick', userID, playerID });
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
@@ -125,6 +130,10 @@ export function DraftRoom() {
               </div>
             </div>
           </>
+        ) : isDraftComplete ? (
+          <div className="mb-4 p-8 bg-gray-800 rounded text-center">
+            <h2 className="text-xl font-semibold mb-2">Draft Complete</h2>
+          </div>
         ) : (
           <>
             {/* Draft Order */}
@@ -132,26 +141,12 @@ export function DraftRoom() {
               <DraftOrder />
             </div>
 
-            {/* Draft Status */}
-            <div className="mb-4 p-4 bg-gray-800 rounded">
-              <h2 className="font-semibold mb-2">Draft Status</h2>
-              <div className="grid grid-cols-2 gap-2 text-sm">
-                <div>Status: <span className="text-blue-400">{draftStatus}</span></div>
-                <div>Round: <span className="text-blue-400">{roundNumber}</span></div>
-                <div>Current Turn: <span className="text-blue-400">{currentTurn ?? 'N/A'}</span></div>
-                <div>
-                  {isMyTurn ? (
-                    <span className="text-green-400 font-bold">YOUR TURN!</span>
-                  ) : (
-                    <span className="text-gray-400">Waiting...</span>
-                  )}
-                </div>
+            {/* Draft Status + Timer */}
+            <div className="mb-4 p-4 bg-gray-800 rounded flex items-center justify-between">
+              <div className="text-sm">
+                <div>Round <span className="text-blue-400 font-medium">{roundNumber}</span></div>
               </div>
-              {turnDeadline && (
-                <div className="mt-2 text-xs text-gray-400">
-                  Turn deadline: {new Date(turnDeadline * 1000).toLocaleTimeString()}
-                </div>
-              )}
+              <DraftTimer />
             </div>
           </>
         )}
@@ -165,7 +160,7 @@ export function DraftRoom() {
 
           {/* Center: Available Golfers */}
           <div className="overflow-y-auto max-h-[calc(100vh-300px)]">
-            <PlayerList />
+            <PlayerList onPickPlayer={pickPlayer} />
           </div>
 
           {/* Right: Pick History */}

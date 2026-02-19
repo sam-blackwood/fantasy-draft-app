@@ -1,9 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useDraftStore } from "../store/draftStore";
+import { useLocalStore } from "../store/localStore";
 import { usePlayerStore } from "../store/playerStore";
 import type { Player, PlayerSort } from "../types";
 
-export function PlayerList() {
+interface PlayerListProps {
+  onPickPlayer?: (playerID: number) => void;
+}
+
+export function PlayerList({ onPickPlayer }: PlayerListProps) {
   // State properties
   const [searchFilter, setSearchFilter] = useState<string>('');
   const [sortConfig, setSortConfig] = useState<PlayerSort | null>(null);
@@ -32,6 +37,25 @@ export function PlayerList() {
    * The IDs of all players who have yet been drafted.
    */
   const availablePlayerIDs = useDraftStore((s) => s.availablePlayerIDs);
+  const pickHistory = useDraftStore((s) => s.pickHistory);
+  const registeredUsers = useDraftStore((s) => s.registeredUsers);
+  const currentTurn = useDraftStore((s) => s.currentTurn);
+  const draftStatus = useDraftStore((s) => s.draftStatus);
+  const userID = useLocalStore((s) => s.userID);
+
+  const isMyTurn = draftStatus === 'in_progress' && currentTurn === userID;
+
+  /**
+   * Map from playerID to the username who drafted them.
+   */
+  const draftedByMap = useMemo(() => {
+    const userMap = new Map(registeredUsers.map((u) => [u.id, u.username]));
+    const map = new Map<number, string>();
+    for (const pick of pickHistory) {
+      map.set(pick.playerID, userMap.get(pick.userID) ?? `User ${pick.userID}`);
+    }
+    return map;
+  }, [pickHistory, registeredUsers]);
 
   /**
    * The array of Player objects who have yet been drafted.
@@ -232,22 +256,36 @@ export function PlayerList() {
                     {sortConfig?.sortField === 'countryCode' && <span className="absolute -right-3 top-1/2 -translate-y-1/2 text-[10px] text-blue-400">{sortConfig.sortDirection === 'asc' ? '\u25B2' : '\u25BC'}</span>}
                   </button>
                 </th>
+                <th className="pb-2 w-16"></th>
               </tr>
             </thead>
             <tbody>
               {displayedPlayers.map((player) => {
-                const isDrafted = draftedPlayers.some((d) => d.id === player.id);
+                const draftedBy = draftedByMap.get(player.id);
+                const canPick = isMyTurn && !draftedBy && onPickPlayer;
                 return (
                   <tr
                     key={player.id}
-                    className={`border-b border-gray-700/50 odd:bg-gray-700/30 ${isDrafted ? 'opacity-40' : ''}`}
+                    className={`border-b border-gray-700/50 odd:bg-gray-700/30 ${draftedBy ? 'opacity-40' : ''}`}
                   >
                     <td className="py-2">
-                      {player.firstName} {player.lastName}
+                      <span className={draftedBy ? 'line-through' : ''}>
+                        {player.firstName} {player.lastName}
+                      </span>
                       {player.status === 'amateur' && <span className="ml-1 text-xs text-yellow-400">(a)</span>}
-                      {isDrafted && <span className="ml-2 text-xs text-red-400">(drafted)</span>}
+                      {draftedBy && <span className="ml-2 text-xs text-gray-400">{draftedBy}</span>}
                     </td>
                     <td className="py-2">{player.countryCode}</td>
+                    <td className="py-2 text-right pr-2">
+                      {canPick && (
+                        <button
+                          onClick={() => onPickPlayer(player.id)}
+                          className="px-2 py-1 text-blue-400 hover:text-white hover:bg-blue-600 rounded text-xs font-medium cursor-pointer"
+                        >
+                          Draft
+                        </button>
+                      )}
+                    </td>
                   </tr>
                 );
               })}
