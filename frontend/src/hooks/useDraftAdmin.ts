@@ -9,6 +9,7 @@ interface DraftAdmin {
   pause: () => void;
   resume: () => void;
   makePick: (userID: number, playerID: number) => void;
+  autopick: () => void;
   status: () => void;
   users: () => void;
 }
@@ -42,6 +43,20 @@ export function useDraftAdmin(sendMessage: (message: ClientMessage) => void) {
       },
       makePick: (userID: number, playerID: number) => {
         sendMessage({ type: 'make_pick', userID, playerID });
+      },
+      autopick: () => {
+        const { currentTurn, availablePlayerIDs, draftStatus } = useDraftStore.getState();
+        if (draftStatus !== 'in_progress') {
+          console.warn('Draft is not in progress');
+          return;
+        }
+        if (currentTurn == null || !availablePlayerIDs?.length) {
+          console.warn('No current turn or no available players');
+          return;
+        }
+        const playerID = availablePlayerIDs[Math.floor(Math.random() * availablePlayerIDs.length)];
+        console.log(`Autopicking player ${playerID} for user ${currentTurn}`);
+        sendMessage({ type: 'make_pick', userID: currentTurn, playerID });
       },
       status: () => {
         const state = useDraftStore.getState();
