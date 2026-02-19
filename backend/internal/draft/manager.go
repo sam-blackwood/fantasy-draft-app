@@ -52,8 +52,9 @@ func (m *Manager) Run() {
 				}
 				seen[c.UserID] = true
 				existingMsg, _ := json.Marshal(map[string]interface{}{
-					"type":   MsgTypeUserJoined,
-					"userID": c.UserID,
+					"type":     MsgTypeUserJoined,
+					"userID":   c.UserID,
+					"username": c.Username,
 				})
 				select {
 				case client.Send <- existingMsg:
@@ -64,8 +65,9 @@ func (m *Manager) Run() {
 			// Only broadcast user_joined if this is the first connection for this userID
 			if !alreadyConnected {
 				joinMsg, _ := json.Marshal(map[string]interface{}{
-					"type":   MsgTypeUserJoined,
-					"userID": client.UserID,
+					"type":     MsgTypeUserJoined,
+					"userID":   client.UserID,
+					"username": client.Username,
 				})
 				for c := range m.clients {
 					if c == client {

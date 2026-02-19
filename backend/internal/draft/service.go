@@ -59,9 +59,10 @@ func (s *DraftService) GetRoom() *DraftState {
 
 // Client represents a WebSocket client connection
 type Client struct {
-	Conn   *websocket.Conn
-	Send   chan []byte // Buffered channel for outgoing messages
-	UserID int
+	Conn     *websocket.Conn
+	Send     chan []byte // Buffered channel for outgoing messages
+	UserID   int
+	Username string
 }
 
 // SendError sends an error message to this client
@@ -86,6 +87,7 @@ func (s *DraftService) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "userID must be a positive integer", http.StatusBadRequest)
 		return
 	}
+	username := r.URL.Query().Get("username")
 
 	// Upgrade HTTP connection to WebSocket
 	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
@@ -103,9 +105,10 @@ func (s *DraftService) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	// Create client
 	client := &Client{
-		Conn:   conn,
-		Send:   make(chan []byte, 256), // Buffered channel
-		UserID: userID,
+		Conn:     conn,
+		Send:     make(chan []byte, 256), // Buffered channel
+		UserID:   userID,
+		Username: username,
 	}
 	// Register client with the draft manager
 	s.manager.Register(client)
