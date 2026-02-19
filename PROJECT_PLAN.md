@@ -74,6 +74,7 @@ Real-time fantasy draft application built as Portfolio Project #1 to demonstrate
      - `startDraft(pickOrder, totalRounds, timerDuration)` — set draft order and start
      - `pause()` / `resume()` — control draft flow
      - `makePick(userID, playerID)` — force picks for absent users
+     - `autopick()` — randomly pick for whoever's on the clock
      - `status()` / `users()` — inspect draft state
    - No admin UI for MVP — admin (the developer) uses the console API from the draft room page
    - View draft results
@@ -185,13 +186,19 @@ This approach works because:
 - [x] Player board with search/filter/sort
 - [x] Pre-draft lobby (waiting state with connected user list)
 - [x] Console admin API for draft control (`useDraftAdmin` hook)
-- [ ] Team roster display (live updates)
-- [ ] Draft timer and turn indicator
-- [ ] Real-time updates when players are drafted
+- [x] Three-panel layout: Team Roster | Player List | Draft Results
+- [x] Team roster display with live updates (`TeamRoster.tsx`)
+- [x] Draft results panel with resolved player/user names (`DraftResults.tsx`)
+- [x] Draft timer with pause/resume support (`DraftTimer.tsx`)
+- [x] Real-time updates when players are drafted (strikethrough + drafter name)
+- [x] Pick button UI (appears on user's turn, sends `make_pick` via WebSocket)
+- [x] Draft complete banner
+- [x] `autopick()` admin command for skipping inactive users
+- [x] DB management shell script (`scripts/db.sh`: seed, draft-reset, migrate, fresh)
 - [ ] Visual indicator for auto-drafted picks
+- [ ] Handle reconnection gracefully
 - [ ] Light/dark mode support
 - [ ] Mobile-responsive design
-- [ ] Handle reconnection gracefully
 
 ### Phase 4: Polish & Deploy (Week 4)
 - [ ] End-to-end testing with real draft scenarios
@@ -291,8 +298,12 @@ This approach works because:
 - Keep dev database separate from test database to avoid pollution
 
 ### Database Management
-- Easy reset scripts to restore clean state when testing gets messy
-- Seed data for quick local development
+- Shell script (`backend/scripts/db.sh`) for all DB operations:
+  - `seed` — full clean slate: truncate all tables, insert players + event
+  - `draft-reset` — clear draft results and reset event status, keep users/players
+  - `migrate-up` / `migrate-down` — run or rollback migrations
+  - `fresh` — drop all tables and re-run migrations from scratch
+- Seed data for quick local development (111 Players Championship 2026 golfers)
 - Migrations tracked in version control
 
 ### Timeline Flexibility
@@ -310,4 +321,4 @@ This approach works because:
 
 ---
 
-**Last Updated:** February 18, 2026 (Console Admin API, Pre-Draft Lobby)
+**Last Updated:** February 19, 2026 (Three-panel draft UI, pick buttons, timer, autopick, DB scripts)
