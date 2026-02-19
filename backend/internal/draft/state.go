@@ -99,11 +99,14 @@ func (d *DraftState) StartDraft(pickOrder []int, totalRounds int, timerDuration 
 
 	// Emit draft started message
 	msg, _ := json.Marshal(map[string]interface{}{
-		"type":         MsgTypeDraftStarted,
-		"eventID":      d.eventID,
-		"currentTurn":  d.currentTurnID,
-		"roundNumber":  d.roundNumber,
-		"turnDeadline": d.turnDeadline.Unix(),
+		"type":             MsgTypeDraftStarted,
+		"eventID":          d.eventID,
+		"currentTurn":      d.currentTurnID,
+		"roundNumber":      d.roundNumber,
+		"turnDeadline":     d.turnDeadline.Unix(),
+		"pickOrder":        d.pickOrder,
+		"totalRounds":      d.totalRounds,
+		"availablePlayers": d.availablePlayers,
 	})
 	d.outgoing <- msg
 
