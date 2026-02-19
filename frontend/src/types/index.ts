@@ -143,6 +143,7 @@ export interface DraftStateMessage {
 export interface UserJoinedMessage {
   type: 'user_joined';
   userID: number;
+  username: string;
 }
 
 export interface UserLeftMessage {

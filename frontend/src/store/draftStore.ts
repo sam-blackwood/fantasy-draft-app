@@ -142,14 +142,20 @@ export const useDraftStore = create<DraftState>((set) => ({
 
       case 'user_joined':
         set((state) => {
-          // Don't update state if user already is in the draft (e.g., already joined from another browser tab)
           if (state.connectedUsers.some((u) => u.id === message.userID)) {
             return state;
           }
-          const user = state.registeredUsers.find((u) => u.id === message.userID);
-          return user
-            ? { connectedUsers: [...state.connectedUsers, user] }
-            : state;
+          let user = state.registeredUsers.find((u) => u.id === message.userID);
+          const registeredUsers = user
+            ? state.registeredUsers
+            : [...state.registeredUsers, { id: message.userID, username: message.username, eventID: 0, createdAt: '' }];
+          if (!user) {
+            user = registeredUsers[registeredUsers.length - 1];
+          }
+          return {
+            registeredUsers,
+            connectedUsers: [...state.connectedUsers, user],
+          };
         });
         break;
 

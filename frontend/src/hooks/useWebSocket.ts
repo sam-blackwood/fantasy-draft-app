@@ -20,7 +20,11 @@ export function useWebSocket(userID: number | null) {
     }
 
     setConnectionStatus('connecting');
-    const ws = new WebSocket(`${WS_BASE_URL}?userID=${userID}`);
+    const registeredUsers = useDraftStore.getState().registeredUsers;
+    const username = registeredUsers.find((u) => u.id === userID)?.username;
+    const params = new URLSearchParams({ userID: String(userID) });
+    if (username) params.set('username', username);
+    const ws = new WebSocket(`${WS_BASE_URL}?${params}`);
 
     ws.onopen = () => {
       setConnectionStatus('connected');
