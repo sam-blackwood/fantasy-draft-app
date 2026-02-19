@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { getUsers } from '../api/client';
 import { DraftOrder } from '../components/DraftOrder';
+import { DraftResults } from '../components/DraftResults';
 import { PlayerList } from '../components/PlayerList';
+import { TeamRoster } from '../components/TeamRoster';
 import { useDraftAdmin } from '../hooks/useDraftAdmin';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { useDraftStore } from '../store/draftStore';
@@ -22,7 +24,6 @@ export function DraftRoom() {
   const draftStatus = useDraftStore((s) => s.draftStatus);
   const currentTurn = useDraftStore((s) => s.currentTurn);
   const roundNumber = useDraftStore((s) => s.roundNumber);
-  const pickHistory = useDraftStore((s) => s.pickHistory);
   const lastError = useDraftStore((s) => s.lastError);
   const turnDeadline = useDraftStore((s) => s.turnDeadline);
   const connectedUsers = useDraftStore((s) => s.connectedUsers);
@@ -56,7 +57,7 @@ export function DraftRoom() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Draft Room</h1>
@@ -67,10 +68,10 @@ export function DraftRoom() {
           <div className="flex items-center gap-2">
             <span
               className={`w-3 h-3 rounded-full ${connectionStatus === 'connected'
-                  ? 'bg-green-500'
-                  : connectionStatus === 'connecting'
-                    ? 'bg-yellow-500'
-                    : 'bg-red-500'
+                ? 'bg-green-500'
+                : connectionStatus === 'connecting'
+                  ? 'bg-yellow-500'
+                  : 'bg-red-500'
                 }`}
             />
             <span className="text-sm">
@@ -152,38 +153,25 @@ export function DraftRoom() {
                 </div>
               )}
             </div>
-
-            {/* Pick History */}
-            <div className="mb-4 p-4 bg-gray-800 rounded">
-              <h2 className="font-semibold mb-2">
-                Pick History ({pickHistory.length})
-              </h2>
-              {pickHistory.length === 0 ? (
-                <p className="text-gray-400 text-sm">No picks yet.</p>
-              ) : (
-                <div className="space-y-1 text-sm max-h-48 overflow-y-auto">
-                  {pickHistory.map((pick, i) => (
-                    <div key={i} className="flex justify-between">
-                      <span>
-                        #{pick.pickNumber} - User {pick.userID} picked Player {pick.playerID}
-                      </span>
-                      <span className="text-gray-400">
-                        Round {pick.round}
-                        {pick.autoDraft && (
-                          <span className="text-yellow-500 ml-2">(auto)</span>
-                        )}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </>
         )}
 
-        {/* Player List */}
-        <div className="mb-4">
-          <PlayerList />
+        {/* Three-panel layout: My Team | Available Golfers | Pick History */}
+        <div className="grid grid-cols-[280px_1fr_280px] gap-4">
+          {/* Left: My Team */}
+          <div className="bg-gray-800 rounded p-4 overflow-y-auto max-h-[calc(100vh-300px)]">
+            <TeamRoster />
+          </div>
+
+          {/* Center: Available Golfers */}
+          <div className="overflow-y-auto max-h-[calc(100vh-300px)]">
+            <PlayerList />
+          </div>
+
+          {/* Right: Pick History */}
+          <div className="bg-gray-800 rounded p-4 overflow-y-auto max-h-[calc(100vh-300px)]">
+            <DraftResults />
+          </div>
         </div>
 
         {/* Debug: Raw State */}
