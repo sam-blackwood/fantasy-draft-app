@@ -86,6 +86,9 @@ export interface DraftStartedMessage {
   currentTurn: number;
   roundNumber: number;
   turnDeadline: number;
+  pickOrder: number[];
+  totalRounds: number;
+  availablePlayers: number[];
 }
 
 export interface PickMadeMessage {

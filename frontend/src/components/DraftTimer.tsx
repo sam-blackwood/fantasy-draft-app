@@ -10,7 +10,7 @@ export function DraftTimer() {
 
   useEffect(() => {
     if (draftStatus === 'paused') {
-      setSecondsLeft(Math.ceil(remainingTime));
+      setSecondsLeft(Math.floor(remainingTime));
       return;
     }
 

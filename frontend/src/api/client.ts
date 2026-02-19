@@ -59,3 +59,7 @@ export async function joinDraft(teamName: string, passkey: string): Promise<User
 export async function getEventPlayers(eventID: number): Promise<Player[]> {
   return fetchJSON<Player[]>(`/events/${eventID}/players`);
 }
+
+export async function createDraftRoom(eventID: number): Promise<{ status: string; eventID: number; availablePlayers: number }> {
+  return fetchJSON(`/events/${eventID}/draft-room`, { method: 'POST' });
+}

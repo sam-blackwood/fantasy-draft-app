@@ -65,6 +65,9 @@ export const useDraftStore = create<DraftState>((set) => ({
           currentTurn: message.currentTurn,
           roundNumber: message.roundNumber,
           turnDeadline: message.turnDeadline,
+          pickOrder: message.pickOrder,
+          totalRounds: message.totalRounds,
+          availablePlayerIDs: message.availablePlayers,
           lastError: null,
         });
         break;

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { createDraftRoom } from '../api/client';
 import { useDraftStore } from '../store/draftStore';
 import { useLocalStore } from '../store/localStore';
 import { usePlayerStore } from '../store/playerStore';
@@ -23,12 +24,19 @@ declare global {
 export function useDraftAdmin(sendMessage: (message: ClientMessage) => void) {
   useEffect(() => {
     window.draftAdmin = {
-      startDraft: (pickOrder: number[], totalRounds: number, timerDuration: number) => {
-        const eventID = useLocalStore.getState().eventID;
+      startDraft: async (pickOrder: number[], totalRounds: number, timerDuration: number) => {
+        const eventID = useLocalStore.getState().eventID ?? 0;
+        try {
+          await createDraftRoom(eventID);
+          console.log('Draft room created');
+        } catch (err) {
+          console.error('Failed to create draft room:', err);
+          return;
+        }
         const availablePlayers = usePlayerStore.getState().eventPlayers.map((p) => p.id);
         sendMessage({
           type: 'start_draft',
-          eventID: eventID ?? 0,
+          eventID,
           pickOrder,
           totalRounds,
           timerDuration,
