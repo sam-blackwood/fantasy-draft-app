@@ -62,6 +62,7 @@ export interface MakePickMessage {
   type: 'make_pick';
   userID: number;
   playerID: number;
+  autoDraft?: boolean;
 }
 
 export interface PauseDraftMessage {

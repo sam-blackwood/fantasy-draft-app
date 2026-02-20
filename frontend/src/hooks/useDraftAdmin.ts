@@ -64,7 +64,7 @@ export function useDraftAdmin(sendMessage: (message: ClientMessage) => void) {
         }
         const playerID = availablePlayerIDs[Math.floor(Math.random() * availablePlayerIDs.length)];
         console.log(`Autopicking player ${playerID} for user ${currentTurn}`);
-        sendMessage({ type: 'make_pick', userID: currentTurn, playerID });
+        sendMessage({ type: 'make_pick', userID: currentTurn, playerID, autoDraft: true });
       },
       status: () => {
         const state = useDraftStore.getState();
