@@ -3,13 +3,16 @@ import { useDraftStore } from '../store/draftStore';
 import { useLocalStore } from '../store/localStore';
 import { usePlayerStore } from '../store/playerStore';
 
-export function TeamRoster() {
-  const userID = useLocalStore((s) => s.userID);
-  const registeredUsers = useDraftStore((s) => s.registeredUsers);
+interface TeamRosterProps {
+  viewUserID?: number | null;
+}
+
+export function TeamRoster({ viewUserID }: TeamRosterProps) {
+  const myUserID = useLocalStore((s) => s.userID);
   const pickHistory = useDraftStore((s) => s.pickHistory);
   const eventPlayers = usePlayerStore((s) => s.eventPlayers);
 
-  const username = registeredUsers.find((u) => u.id === userID)?.username;
+  const userID = viewUserID ?? myUserID;
 
   const picks = useMemo(() => {
     if (!userID) return [];
@@ -27,21 +30,6 @@ export function TeamRoster() {
 
   return (
     <div>
-      <h2 className="font-semibold mb-3">Your Team</h2>
-
-      {/* Team header card */}
-      <div className="bg-green-700 rounded-lg p-4 mb-4 flex justify-between items-end">
-        <div>
-          <div className="font-bold text-lg">{username ?? 'Unknown'}</div>
-        </div>
-        <div className="text-right">
-          <div className="text-2xl font-bold">{picks.length}</div>
-          <div className="text-green-200 text-xs">
-            {picks.length === 1 ? 'golfer' : 'golfers'}
-          </div>
-        </div>
-      </div>
-
       {/* Roster list */}
       {picks.length === 0 ? (
         <p className="text-gray-500 text-sm text-center py-4">No picks yet</p>

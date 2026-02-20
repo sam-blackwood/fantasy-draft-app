@@ -46,7 +46,7 @@ export function DraftTimer() {
 
   return (
     <div className="text-center">
-      <div className={`text-4xl font-bold font-mono ${colorClass}`}>
+      <div className={`text-2xl font-bold font-mono ${colorClass}`}>
         {display}
       </div>
       {isPaused && (

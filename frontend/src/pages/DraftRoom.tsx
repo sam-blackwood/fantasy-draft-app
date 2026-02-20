@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { getUsers } from '../api/client';
+import { getEvent, getUsers } from '../api/client';
 import { DraftOrder } from '../components/DraftOrder';
 import { DraftResults } from '../components/DraftResults';
 import { DraftTimer } from '../components/DraftTimer';
@@ -30,6 +30,8 @@ export function DraftRoom() {
 
   const reconnectAttempt = useDraftStore((s) => s.reconnectAttempt);
 
+  const [eventName, setEventName] = useState<string>('Draft');
+
   const initializeEventPlayers = usePlayerStore((s) => s.setEventPlayers);
   const setRegisteredUsers = useDraftStore((s) => s.setRegisteredUsers);
 
@@ -43,6 +45,15 @@ export function DraftRoom() {
       .catch((err) => console.error('Failed to fetch users:', err));
     return () => disconnect();
   }, [connect, disconnect, setRegisteredUsers]);
+
+  // Fetch event name
+  useEffect(() => {
+    if (eventID != null) {
+      getEvent(eventID)
+        .then((event) => setEventName(event.name))
+        .catch((err) => console.error('Failed to fetch event:', err));
+    }
+  }, [eventID]);
 
   // Initialize players for the given eventID
   useEffect(() => {
@@ -71,7 +82,7 @@ export function DraftRoom() {
   // Computed values
   const isPreDraft = draftStatus === 'idle';
   const isDraftComplete = draftStatus === 'completed';
-  const myUsername = registeredUsers.find((u) => u.id === userID)?.username;
+  const [viewTeamID, setViewTeamID] = useState<number | null>(null);
 
   function pickPlayer(playerID: number) {
     if (userID != null) {
@@ -84,33 +95,7 @@ export function DraftRoom() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Draft Room</h1>
-        </div>
-
-        {/* Connection Status */}
-        <div className="mb-4 p-3 bg-gray-800 rounded">
-          <div className="flex items-center gap-2">
-            <span
-              className={`w-3 h-3 rounded-full ${connectionStatus === 'connected'
-                ? 'bg-green-500'
-                : connectionStatus === 'connecting'
-                  ? 'bg-yellow-500'
-                  : 'bg-red-500'
-                }`}
-            />
-            <span className="text-sm">
-              {connectionStatus === 'connected'
-                ? 'Connected'
-                : connectionStatus === 'connecting' && reconnectAttempt > 0
-                  ? `Reconnecting (attempt ${reconnectAttempt})...`
-                  : connectionStatus === 'connecting'
-                    ? 'Connecting...'
-                    : 'Disconnected'}
-            </span>
-          </div>
-          <p className="text-xs text-gray-400 mt-1">
-            {myUsername ? `Connected as ${myUsername} (ID: ${userID})` : `User ID: ${userID}`}
-          </p>
+          <h1 className="text-2xl font-bold">{eventName} Draft</h1>
         </div>
 
         {/* Reconnection Banner */}
@@ -193,8 +178,8 @@ export function DraftRoom() {
 
             {/* Draft Status + Timer */}
             <div className="mb-4 p-4 bg-gray-800 rounded flex items-center justify-between">
-              <div className="text-sm">
-                <div>Round <span className="text-blue-400 font-medium">{roundNumber}</span></div>
+              <div className="text-xl font-semibold">
+                Round <span className="text-blue-400">{roundNumber}</span>
               </div>
               <DraftTimer />
             </div>
@@ -203,9 +188,21 @@ export function DraftRoom() {
 
         {/* Three-panel layout: My Team | Available Golfers | Pick History */}
         <div className="grid grid-cols-[280px_1fr_280px] gap-4">
-          {/* Left: My Team */}
+          {/* Left: Team Roster */}
           <div className="bg-gray-800 rounded p-4 overflow-y-auto max-h-[calc(100vh-300px)]">
-            <TeamRoster />
+            <select
+              value={viewTeamID ?? ''}
+              onChange={(e) => setViewTeamID(e.target.value ? Number(e.target.value) : null)}
+              className="w-full mb-3 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm text-white"
+            >
+              <option value="">My Team</option>
+              {registeredUsers
+                .filter((u) => u.id !== userID)
+                .map((u) => (
+                  <option key={u.id} value={u.id}>{u.username}</option>
+                ))}
+            </select>
+            <TeamRoster viewUserID={viewTeamID} />
           </div>
 
           {/* Center: Available Golfers */}
