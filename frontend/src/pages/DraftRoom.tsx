@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getUsers } from '../api/client';
 import { DraftOrder } from '../components/DraftOrder';
 import { DraftResults } from '../components/DraftResults';
@@ -15,7 +15,7 @@ export function DraftRoom() {
   const userID = useLocalStore((s) => s.userID);
 
   // Custom hook - WebSocket connection methods
-  const { connect, disconnect, sendMessage } = useWebSocket(userID);
+  const { connect, disconnect, sendMessage, reconnectNow } = useWebSocket(userID);
   // Setup the console API for the admin
   useDraftAdmin(sendMessage);
 
@@ -27,6 +27,8 @@ export function DraftRoom() {
   const lastError = useDraftStore((s) => s.lastError);
   const connectedUsers = useDraftStore((s) => s.connectedUsers);
   const registeredUsers = useDraftStore((s) => s.registeredUsers);
+
+  const reconnectAttempt = useDraftStore((s) => s.reconnectAttempt);
 
   const initializeEventPlayers = usePlayerStore((s) => s.setEventPlayers);
   const setRegisteredUsers = useDraftStore((s) => s.setRegisteredUsers);
@@ -48,6 +50,23 @@ export function DraftRoom() {
       initializeEventPlayers(eventID)
     }
   }, [eventID, initializeEventPlayers])
+
+  // Reconnection success banner
+  const [showReconnected, setShowReconnected] = useState(false);
+  const wasReconnectingRef = useRef(false);
+
+  useEffect(() => {
+    if (reconnectAttempt > 0) {
+      wasReconnectingRef.current = true;
+    }
+
+    if (connectionStatus === 'connected' && wasReconnectingRef.current) {
+      wasReconnectingRef.current = false;
+      setShowReconnected(true);
+      const timer = setTimeout(() => setShowReconnected(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [connectionStatus, reconnectAttempt]);
 
   // Computed values
   const isPreDraft = draftStatus === 'idle';
@@ -82,15 +101,46 @@ export function DraftRoom() {
             <span className="text-sm">
               {connectionStatus === 'connected'
                 ? 'Connected'
-                : connectionStatus === 'connecting'
-                  ? 'Connecting...'
-                  : 'Disconnected'}
+                : connectionStatus === 'connecting' && reconnectAttempt > 0
+                  ? `Reconnecting (attempt ${reconnectAttempt})...`
+                  : connectionStatus === 'connecting'
+                    ? 'Connecting...'
+                    : 'Disconnected'}
             </span>
           </div>
           <p className="text-xs text-gray-400 mt-1">
             {myUsername ? `Connected as ${myUsername} (ID: ${userID})` : `User ID: ${userID}`}
           </p>
         </div>
+
+        {/* Reconnection Banner */}
+        {connectionStatus === 'disconnected' && reconnectAttempt > 0 && (
+          <div className="mb-4 p-3 bg-yellow-900/50 border border-yellow-700 rounded flex items-center justify-between">
+            <div>
+              <span className="text-yellow-300 font-medium">Connection lost. Reconnecting...</span>
+              <span className="text-yellow-400 text-sm ml-2">(attempt {reconnectAttempt})</span>
+            </div>
+            <button
+              onClick={reconnectNow}
+              className="px-3 py-1 bg-yellow-700 hover:bg-yellow-600 text-white text-sm rounded"
+            >
+              Reconnect now
+            </button>
+          </div>
+        )}
+
+        {connectionStatus === 'connecting' && reconnectAttempt > 0 && (
+          <div className="mb-4 p-3 bg-yellow-900/50 border border-yellow-700 rounded">
+            <span className="text-yellow-300 font-medium">Reconnecting...</span>
+            <span className="text-yellow-400 text-sm ml-2">(attempt {reconnectAttempt})</span>
+          </div>
+        )}
+
+        {showReconnected && (
+          <div className="mb-4 p-3 bg-green-900/50 border border-green-700 rounded text-green-300 font-medium">
+            Reconnected!
+          </div>
+        )}
 
         {/* Error Display */}
         {lastError && (

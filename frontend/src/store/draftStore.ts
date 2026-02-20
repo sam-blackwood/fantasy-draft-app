@@ -24,11 +24,15 @@ interface DraftState {
   connectedUsers: User[];
   registeredUsers: User[];
 
+  // Reconnection
+  reconnectAttempt: number;
+
   // Error
   lastError: string | null;
 
   // Actions
   setConnectionStatus: (status: ConnectionStatus) => void;
+  setReconnectAttempt: (attempt: number) => void;
   setRegisteredUsers: (users: User[]) => void;
   handleServerMessage: (message: ServerMessage) => void;
   reset: () => void;
@@ -47,6 +51,7 @@ const initialState = {
   turnDeadline: null,
   remainingTime: 0,
   connectedUsers: [] as User[],
+  reconnectAttempt: 0,
   registeredUsers: [] as User[],
   lastError: null,
 };
@@ -55,6 +60,7 @@ export const useDraftStore = create<DraftState>((set) => ({
   ...initialState,
 
   setConnectionStatus: (status) => set({ connectionStatus: status }),
+  setReconnectAttempt: (attempt) => set({ reconnectAttempt: attempt }),
   setRegisteredUsers: (users) => set({ registeredUsers: users }),
 
   handleServerMessage: (message) => {
