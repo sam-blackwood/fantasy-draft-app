@@ -67,11 +67,12 @@ type User struct {
 
 // DraftResult represents a pick made during a draft
 type DraftResult struct {
-	ID         int       `json:"id"`
-	EventID    int       `json:"eventID"`
-	UserID     int       `json:"userID"`
-	PlayerID   int       `json:"playerID"`
-	PickNumber int       `json:"pickNumber"`
-	Round      int       `json:"round"`
-	CreatedAt  time.Time `json:"createdAt"`
+	ID          int       `json:"id"`
+	EventID     int       `json:"eventID"`
+	UserID      int       `json:"userID"`
+	PlayerID    int       `json:"playerID"`
+	PickNumber  int       `json:"pickNumber"`
+	Round       int       `json:"round"`
+	IsAutoDraft bool      `json:"isAutoDraft"`
+	CreatedAt   time.Time `json:"createdAt"`
 }

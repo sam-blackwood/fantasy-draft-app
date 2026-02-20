@@ -42,9 +42,10 @@ type StartDraftMessage struct {
 
 // MakePickMessage represents the payload for making a pick
 type MakePickMessage struct {
-	Type     string `json:"type"`
-	UserID   int    `json:"userID"`
-	PlayerID int    `json:"playerID"`
+	Type      string `json:"type"`
+	UserID    int    `json:"userID"`
+	PlayerID  int    `json:"playerID"`
+	AutoDraft bool   `json:"autoDraft"`
 }
 
 // handleStartDraft initializes and starts the draft
@@ -109,7 +110,7 @@ func (s *DraftService) handleMakePick(c *Client, data []byte) {
 		return
 	}
 
-	if err := state.MakePick(msg.UserID, msg.PlayerID); err != nil {
+	if err := state.MakePick(msg.UserID, msg.PlayerID, msg.AutoDraft); err != nil {
 		c.SendError(err.Error())
 		return
 	}
@@ -164,7 +165,7 @@ func (s *DraftService) startOutgoingBridge(state *DraftState) {
 func (s *DraftService) startPickPersistence(state *DraftState) {
 	for pick := range state.PickResults() {
 		ctx := context.Background()
-		if err := s.pickSaver.SavePick(ctx, pick.EventID, pick.UserID, pick.PlayerID, pick.PickNumber, pick.Round); err != nil {
+		if err := s.pickSaver.SavePick(ctx, pick.EventID, pick.UserID, pick.PlayerID, pick.PickNumber, pick.Round, pick.AutoDraft); err != nil {
 			log.Printf("Failed to persist pick: %v", err)
 		} else {
 			log.Printf("Persisted pick: event=%d user=%d player=%d pick#=%d round=%d auto=%v",

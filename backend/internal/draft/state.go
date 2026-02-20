@@ -254,7 +254,7 @@ func (d *DraftState) completeDraft() {
 
 // MakePick processes a pick from a user
 // Returns error if invalid (not your turn, player unavailable, etc.)
-func (d *DraftState) MakePick(userID, playerID int) error {
+func (d *DraftState) MakePick(userID, playerID int, autoDraft bool) error {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
@@ -280,7 +280,7 @@ func (d *DraftState) MakePick(userID, playerID int) error {
 		d.draftStatus = StatusInProgress
 	}
 
-	d.recordPick(userID, playerID, false)
+	d.recordPick(userID, playerID, autoDraft)
 
 	return nil
 }

@@ -16,27 +16,28 @@ func NewDraftResultRepository(pool *pgxpool.Pool) *DraftResultRepository {
 }
 
 // SavePick inserts a pick into the database (implements draft.PickSaver interface)
-func (r *DraftResultRepository) SavePick(ctx context.Context, eventID, userID, playerID, pickNumber, round int) error {
-	_, err := r.Create(ctx, eventID, userID, playerID, pickNumber, round)
+func (r *DraftResultRepository) SavePick(ctx context.Context, eventID, userID, playerID, pickNumber, round int, isAutoDraft bool) error {
+	_, err := r.Create(ctx, eventID, userID, playerID, pickNumber, round, isAutoDraft)
 	return err
 }
 
 // Create inserts a new draft result (pick) into the database
-func (r *DraftResultRepository) Create(ctx context.Context, eventID, userID, playerID, pickNumber, round int) (*models.DraftResult, error) {
+func (r *DraftResultRepository) Create(ctx context.Context, eventID, userID, playerID, pickNumber, round int, isAutoDraft bool) (*models.DraftResult, error) {
 	query := `
-		INSERT INTO draft_results (event_id, user_id, player_id, pick_number, round)
-		VALUES ($1, $2, $3, $4, $5)
-		RETURNING id, event_id, user_id, player_id, pick_number, round, created_at
+		INSERT INTO draft_results (event_id, user_id, player_id, pick_number, round, is_auto_draft)
+		VALUES ($1, $2, $3, $4, $5, $6)
+		RETURNING id, event_id, user_id, player_id, pick_number, round, is_auto_draft, created_at
 	`
 
 	var result models.DraftResult
-	err := r.pool.QueryRow(ctx, query, eventID, userID, playerID, pickNumber, round).Scan(
+	err := r.pool.QueryRow(ctx, query, eventID, userID, playerID, pickNumber, round, isAutoDraft).Scan(
 		&result.ID,
 		&result.EventID,
 		&result.UserID,
 		&result.PlayerID,
 		&result.PickNumber,
 		&result.Round,
+		&result.IsAutoDraft,
 		&result.CreatedAt,
 	)
 	if err != nil {
@@ -49,7 +50,7 @@ func (r *DraftResultRepository) Create(ctx context.Context, eventID, userID, pla
 // GetByEvent returns all draft results for a given event
 func (r *DraftResultRepository) GetByEvent(ctx context.Context, eventID int) ([]models.DraftResult, error) {
 	query := `
-		SELECT id, event_id, user_id, player_id, pick_number, round, created_at
+		SELECT id, event_id, user_id, player_id, pick_number, round, is_auto_draft, created_at
 		FROM draft_results
 		WHERE event_id = $1
 		ORDER BY pick_number
@@ -71,6 +72,7 @@ func (r *DraftResultRepository) GetByEvent(ctx context.Context, eventID int) ([]
 			&result.PlayerID,
 			&result.PickNumber,
 			&result.Round,
+			&result.IsAutoDraft,
 			&result.CreatedAt,
 		); err != nil {
 			return nil, err
@@ -84,7 +86,7 @@ func (r *DraftResultRepository) GetByEvent(ctx context.Context, eventID int) ([]
 // GetByEventAndUser returns all draft results for a given event and user
 func (r *DraftResultRepository) GetByEventAndUser(ctx context.Context, eventID, userID int) ([]models.DraftResult, error) {
 	query := `
-		SELECT id, event_id, user_id, player_id, pick_number, round, created_at
+		SELECT id, event_id, user_id, player_id, pick_number, round, is_auto_draft, created_at
 		FROM draft_results
 		WHERE event_id = $1 AND user_id = $2
 		ORDER BY pick_number
@@ -106,6 +108,7 @@ func (r *DraftResultRepository) GetByEventAndUser(ctx context.Context, eventID, 
 			&result.PlayerID,
 			&result.PickNumber,
 			&result.Round,
+			&result.IsAutoDraft,
 			&result.CreatedAt,
 		); err != nil {
 			return nil, err

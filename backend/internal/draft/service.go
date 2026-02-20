@@ -13,7 +13,7 @@ import (
 
 // PickSaver defines the interface for persisting draft picks
 type PickSaver interface {
-	SavePick(ctx context.Context, eventID, userID, playerID, pickNumber, round int) error
+	SavePick(ctx context.Context, eventID, userID, playerID, pickNumber, round int, isAutoDraft bool) error
 }
 
 // EventUpdater defines the interface for updating event status
