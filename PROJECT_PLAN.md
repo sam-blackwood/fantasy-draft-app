@@ -195,7 +195,9 @@ This approach works because:
 - [x] Draft complete banner
 - [x] `autopick()` admin command for skipping inactive users
 - [x] DB management shell script (`scripts/db.sh`: seed, draft-reset, migrate, fresh)
-- [ ] Visual indicator for auto-drafted picks
+- [x] Visual indicator for auto-drafted picks (DraftResults + TeamRoster show "(auto)" label)
+- [x] Auto-draft flag persisted to database (`is_auto_draft` column, migration 000006)
+- [x] Console `autopick()` command correctly flags picks as auto-drafted
 - [ ] Handle reconnection gracefully
 - [ ] Light/dark mode support
 - [ ] Mobile-responsive design
@@ -321,4 +323,4 @@ This approach works because:
 
 ---
 
-**Last Updated:** February 19, 2026 (Three-panel draft UI, pick buttons, timer, autopick, DB scripts)
+**Last Updated:** February 20, 2026 (Auto-draft persistence + console autopick flag)
