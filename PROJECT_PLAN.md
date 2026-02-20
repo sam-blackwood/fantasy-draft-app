@@ -198,7 +198,7 @@ This approach works because:
 - [x] Visual indicator for auto-drafted picks (DraftResults + TeamRoster show "(auto)" label)
 - [x] Auto-draft flag persisted to database (`is_auto_draft` column, migration 000006)
 - [x] Console `autopick()` command correctly flags picks as auto-drafted
-- [ ] Handle reconnection gracefully
+- [x] Handle reconnection gracefully (auto-reconnect with exponential backoff, reconnection banner UI)
 - [ ] Light/dark mode support
 - [ ] Mobile-responsive design
 
@@ -323,4 +323,4 @@ This approach works because:
 
 ---
 
-**Last Updated:** February 20, 2026 (Auto-draft persistence + console autopick flag)
+**Last Updated:** February 20, 2026 (Graceful WebSocket reconnection with exponential backoff)
