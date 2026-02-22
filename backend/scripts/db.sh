@@ -7,6 +7,7 @@
 #   seed          Full re-seed (wipes everything, inserts players + event)
 #   migrate-up    Run all pending migrations
 #   migrate-down  Roll back ALL migrations
+#   clear-users   Delete all users and draft results, reset event status
 #   fresh         Full rebuild: drop schema, re-migrate, re-seed
 
 set -e
@@ -19,6 +20,10 @@ case "${1}" in
   draft-reset)
     echo "Resetting draft state (keeping users)..."
     psql "$DATABASE_URL" -f "$SCRIPT_DIR/draft_reset.sql"
+    ;;
+  clear-users)
+    echo "Clearing all users and draft results..."
+    psql "$DATABASE_URL" -f "$SCRIPT_DIR/clear_users.sql"
     ;;
   seed)
     echo "Seeding all data from scratch..."
@@ -39,10 +44,11 @@ case "${1}" in
     "$0" seed
     ;;
   *)
-    echo "Usage: $0 {draft-reset|seed|migrate-up|migrate-down|fresh}"
+    echo "Usage: $0 {draft-reset|clear-users|seed|migrate-up|migrate-down|fresh}"
     echo ""
     echo "Commands:"
     echo "  draft-reset   Clear draft picks, reset event status (keeps users)"
+    echo "  clear-users   Delete all users and draft results, reset event status"
     echo "  seed          Full re-seed (wipes everything, inserts players + event)"
     echo "  migrate-up    Run all pending migrations"
     echo "  migrate-down  Roll back ALL migrations"
