@@ -146,7 +146,7 @@ export function DraftRoom() {
 
             {/* Users */}
             <div className="mb-4 p-4 bg-gray-800 rounded">
-              <h2 className="font-semibold mb-2">Users</h2>
+              <h2 className="font-semibold mb-2">Lobby</h2>
               <div className="space-y-1 text-sm">
                 {registeredUsers.map((user) => {
                   const isMe = user.id === userID;
