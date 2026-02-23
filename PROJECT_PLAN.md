@@ -32,8 +32,8 @@ Real-time fantasy draft application built as Portfolio Project #1 to demonstrate
 - **Styling:** Tailwind CSS
 
 ### Infrastructure
-- **Hosting:** Render.com (or similar cost-effective platform)
-- **Database:** Managed PostgreSQL (Render or similar)
+- **Hosting:** AWS EC2 (t3.micro, free tier)
+- **Database:** AWS RDS PostgreSQL (db.t3.micro, free tier)
 - **Version Control:** Git + GitHub
 
 ---
@@ -207,7 +207,7 @@ This approach works because:
 - [ ] Performance optimization (sub-100ms responses)
 - [ ] Error handling and user feedback
 - [ ] Documentation (README, API docs, setup instructions)
-- [ ] Deploy to Render (backend + frontend + database)
+- [ ] Deploy to AWS (EC2 + RDS PostgreSQL)
 - [ ] Test with friends (dry run before Players Championship)
 - [ ] Final polish based on feedback
 
@@ -243,7 +243,7 @@ This approach works because:
 
 ### Business
 - [ ] Friends can actually use it for Players Championship
-- [ ] Deploy with <$20/month hosting costs
+- [ ] Deploy with $0/month hosting costs (AWS free tier)
 - [ ] Ready to present to potential employers
 
 ### Personal
