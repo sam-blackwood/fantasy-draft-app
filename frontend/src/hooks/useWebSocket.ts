@@ -2,7 +2,8 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useDraftStore } from '../store/draftStore';
 import type { ClientMessage, ServerMessage } from '../types';
 
-const WS_BASE_URL = 'ws://localhost:8080/ws/draft';
+const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+const WS_BASE_URL = import.meta.env.VITE_WS_BASE || `${protocol}//${window.location.host}/ws/draft`;
 const RECONNECT_BASE_DELAY = 1000; // 1 second
 const RECONNECT_MAX_DELAY = 30000; // 30 seconds
 
