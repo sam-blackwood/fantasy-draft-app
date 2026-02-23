@@ -1,6 +1,11 @@
 package main
 
 import (
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
@@ -23,8 +28,12 @@ func setupRoutes(r *chi.Mux, db *database.DB, deps *Dependencies) {
 	// Middleware
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
+	allowedOrigins := []string{"http://localhost:3000", "http://localhost:5173"}
+	if origins := os.Getenv("CORS_ORIGINS"); origins != "" {
+		allowedOrigins = strings.Split(origins, ",")
+	}
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:5173"},
+		AllowedOrigins:   allowedOrigins,
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
 		ExposedHeaders:   []string{"Link"},
@@ -68,4 +77,14 @@ func setupRoutes(r *chi.Mux, db *database.DB, deps *Dependencies) {
 	r.Post("/events/{id}/draft-room", deps.DraftRoom.CreateDraftRoom)
 	r.Get("/events/{id}/draft-room", deps.DraftRoom.GetDraftRoom)
 	r.Post("/events/join", deps.DraftRoom.JoinEvent)
+
+	// Serve static frontend files in production
+	if staticDir := os.Getenv("STATIC_DIR"); staticDir != "" {
+		fs := http.FileServer(http.Dir(staticDir))
+		r.Handle("/assets/*", http.StripPrefix("/", fs))
+		// SPA fallback — serve index.html for all unmatched routes
+		r.NotFound(func(w http.ResponseWriter, r *http.Request) {
+			http.ServeFile(w, r, filepath.Join(staticDir, "index.html"))
+		})
+	}
 }

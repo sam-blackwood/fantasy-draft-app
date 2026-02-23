@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"sync"
 
@@ -90,11 +91,13 @@ func (s *DraftService) HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	username := r.URL.Query().Get("username")
 
 	// Upgrade HTTP connection to WebSocket
-	conn, err := websocket.Accept(w, r, &websocket.AcceptOptions{
-		// Allow all origins for development (file:// and localhost)
-		// In production, restrict this to your frontend domain
-		InsecureSkipVerify: true,
-	})
+	// In production, the default origin check (Origin must match Host) is enforced.
+	// In development, InsecureSkipVerify allows all origins.
+	opts := &websocket.AcceptOptions{}
+	if os.Getenv("ENVIRONMENT") != "production" {
+		opts.InsecureSkipVerify = true
+	}
+	conn, err := websocket.Accept(w, r, opts)
 	if err != nil {
 		log.Printf("Failed to upgrade connection: %v", err)
 		http.Error(w, "Failed to upgrade to WebSocket", http.StatusInternalServerError)

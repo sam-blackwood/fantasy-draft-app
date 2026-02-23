@@ -55,7 +55,12 @@ func main() {
 	setupRoutes(r, db, deps)
 
 	// Start server
-	port := ":8080"
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = ":8080"
+	} else if port[0] != ':' {
+		port = ":" + port
+	}
 	fmt.Printf("Server starting on port %s\n", port)
 
 	// Graceful shutdown handling
