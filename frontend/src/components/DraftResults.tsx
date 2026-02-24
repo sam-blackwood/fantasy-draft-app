@@ -32,7 +32,7 @@ export function DraftResults() {
         <div className="space-y-2 text-sm">
           {picks.map((pick) => (
             <div key={pick.pickNumber} className="flex items-start gap-2">
-              <span className="text-content-muted font-mono text-[10px] w-10 text-right shrink-0 pt-1">
+              <span className="text-accent-bright font-mono text-[10px] w-10 text-right shrink-0 pt-1">
                 R{pick.round}P{numTeams > 0 ? ((pick.pickNumber - 1) % numTeams) + 1 : pick.pickNumber}
               </span>
               <div className="min-w-0">
@@ -44,7 +44,7 @@ export function DraftResults() {
                 <div className="text-xs text-content-tertiary">
                   {pick.user?.username ?? `User ${pick.userID}`}
                   {pick.autoDraft && (
-                    <span className="text-yellow-500 ml-1">(auto)</span>
+                    <span className="text-yellow-600 ml-1">(auto)</span>
                   )}
                 </div>
               </div>
