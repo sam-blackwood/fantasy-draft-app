@@ -85,6 +85,7 @@ export function DraftRoom() {
   const isPreDraft = draftStatus === 'idle';
   const isDraftComplete = draftStatus === 'completed';
   const [viewTeamID, setViewTeamID] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<'players' | 'team' | 'picks'>('players');
 
   function pickPlayer(playerID: number) {
     if (userID != null) {
@@ -93,11 +94,11 @@ export function DraftRoom() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-base text-content-primary p-4">
+    <div className="min-h-screen bg-surface-base text-content-primary p-2 md:p-4 overflow-x-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-highlight-text">{eventName} Draft</h1>
+        <div className="flex justify-between items-center mb-4 md:mb-6 gap-2">
+          <h1 className="text-lg md:text-2xl font-bold text-highlight-text truncate">{eventName} Draft</h1>
           <ThemeToggle />
         </div>
 
@@ -140,8 +141,8 @@ export function DraftRoom() {
         {isPreDraft ? (
           <>
             {/* Waiting Banner */}
-            <div className="mb-4 p-8 bg-surface rounded text-center">
-              <h2 className="text-xl font-semibold mb-2 text-highlight-text">Waiting for draft to start...</h2>
+            <div className="mb-4 p-4 md:p-8 bg-surface rounded text-center">
+              <h2 className="text-base md:text-xl font-semibold mb-2 text-highlight-text">Waiting for draft to start...</h2>
               <p className="text-content-tertiary text-sm">
                 The draft admin will start the draft once everyone is ready.
               </p>
@@ -171,8 +172,56 @@ export function DraftRoom() {
           </>
         )}
 
-        {/* Three-panel layout: My Team | Available Golfers | Pick History */}
-        <div className="grid grid-cols-[280px_1fr_280px] gap-4">
+        {/* Mobile tab bar */}
+        <div className="flex md:hidden mb-2 bg-surface rounded overflow-hidden">
+          {([['players', 'Players'], ['team', 'Rosters'], ['picks', 'Picks']] as const).map(([tab, label]) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                activeTab === tab
+                  ? 'bg-surface-input text-accent-bright border-b-2 border-accent-bright'
+                  : 'text-content-tertiary hover:text-content-secondary'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* Mobile: single panel based on active tab */}
+        <div className="md:hidden">
+          {activeTab === 'team' && (
+            <div className="bg-surface rounded p-4 overflow-y-auto max-h-[calc(100vh-280px)]">
+              <select
+                value={viewTeamID ?? ''}
+                onChange={(e) => setViewTeamID(e.target.value ? Number(e.target.value) : null)}
+                className="w-full mb-3 px-2 py-1 bg-surface-input border border-edge-input rounded text-sm text-content-primary"
+              >
+                <option value="">My Team</option>
+                {registeredUsers
+                  .filter((u) => u.id !== userID)
+                  .map((u) => (
+                    <option key={u.id} value={u.id}>{u.username}</option>
+                  ))}
+              </select>
+              <TeamRoster viewUserID={viewTeamID} />
+            </div>
+          )}
+          {activeTab === 'players' && (
+            <div className="overflow-y-auto max-h-[calc(100vh-280px)]">
+              <PlayerList onPickPlayer={pickPlayer} />
+            </div>
+          )}
+          {activeTab === 'picks' && (
+            <div className="bg-surface rounded p-4 overflow-y-auto max-h-[calc(100vh-280px)]">
+              <DraftResults />
+            </div>
+          )}
+        </div>
+
+        {/* Desktop: Three-panel layout */}
+        <div className="hidden md:grid grid-cols-[280px_1fr_280px] gap-4">
           {/* Left: Team Roster */}
           <div className="bg-surface rounded p-4 overflow-y-auto max-h-[calc(100vh-300px)]">
             <select

@@ -160,7 +160,7 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
   }
 
   return (
-    <div className="p-4 bg-surface rounded flex flex-col max-h-[70vh]">
+    <div className="p-4 bg-surface rounded flex flex-col max-h-[60vh] md:max-h-[70vh] overflow-hidden">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-semibold">Players ({displayedPlayers.length})</h2>
         <select
@@ -174,7 +174,7 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
         </select>
       </div>
 
-      <div className="flex gap-2 mb-4">
+      <div className="flex flex-col md:flex-row gap-2 mb-4">
         <input
           type="text"
           value={searchFilter}
@@ -184,7 +184,7 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
         />
 
         {countryCodes.length > 0 && (
-          <div className="relative w-48" ref={countryDropdownRef}>
+          <div className="relative w-full md:w-48" ref={countryDropdownRef}>
             <button
               onClick={() => setCountryDropdownOpen((prev) => !prev)}
               className="w-full px-3 py-2 bg-surface-input border border-edge-input rounded text-sm text-left flex items-center justify-between"

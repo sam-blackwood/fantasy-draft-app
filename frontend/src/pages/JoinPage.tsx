@@ -26,7 +26,7 @@ export function JoinPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surface-base text-content-primary">
+    <div className="min-h-screen flex items-center justify-center bg-surface-base text-content-primary px-4">
       <div className="fixed top-4 right-4">
         <ThemeToggle />
       </div>
