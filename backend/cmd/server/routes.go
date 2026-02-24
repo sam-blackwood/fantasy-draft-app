@@ -48,6 +48,7 @@ func setupRoutes(r *chi.Mux, db *database.DB, deps *Dependencies) {
 	r.Get("/ws/draft", deps.Draft.HandleWebSocket)
 
 	// Events routes
+	r.Get("/events/next", deps.Event.GetNextEvent)
 	r.Get("/events/{id}", deps.Event.GetEvent)
 	r.Get("/events", deps.Event.ListEvents)
 	r.Post("/events", deps.Event.CreateEvent)

@@ -19,6 +19,28 @@ func NewEventHandler(repo *repository.EventRepository) *EventHandler {
 	return &EventHandler{repo: repo}
 }
 
+// GetNextEvent handles GET /events/next
+func (h *EventHandler) GetNextEvent(w http.ResponseWriter, r *http.Request) {
+	event, err := h.repo.GetNextUpcoming(r.Context())
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte("null"))
+			return
+		}
+		http.Error(w, `{"error": "internal server error"}`, http.StatusInternalServerError)
+		return
+	}
+
+	// Strip passkey from response — this endpoint is public
+	event.Passkey = nil
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(event)
+}
+
 // GetEvent handles GET /events/{id}
 func (h *EventHandler) GetEvent(w http.ResponseWriter, r *http.Request) {
 	// Extract ID from URL parameter

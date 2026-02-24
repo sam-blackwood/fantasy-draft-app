@@ -22,6 +22,7 @@ type Event struct {
 	Stipulations      Stipulations `json:"stipulations"`
 	Status            string       `json:"status"`
 	Passkey           *string      `json:"passkey,omitempty"`
+	EventDate         *time.Time   `json:"eventDate,omitempty"`
 	CreatedAt         time.Time    `json:"createdAt"`
 	StartedAt         *time.Time   `json:"startedAt,omitempty"`
 	CompletedAt       *time.Time   `json:"completedAt,omitempty"`

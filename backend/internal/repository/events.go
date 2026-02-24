@@ -21,7 +21,7 @@ func NewEventRepository(pool *pgxpool.Pool) *EventRepository {
 func (r *EventRepository) GetByID(ctx context.Context, id int) (*models.Event, error) {
 	query := `
 		SELECT id, name, max_picks_per_team, max_teams_per_player,
-		       stipulations, status, passkey, created_at, started_at, completed_at
+		       stipulations, status, passkey, event_date, created_at, started_at, completed_at
 		FROM events
 		WHERE id = $1
 	`
@@ -35,6 +35,7 @@ func (r *EventRepository) GetByID(ctx context.Context, id int) (*models.Event, e
 		&event.Stipulations,
 		&event.Status,
 		&event.Passkey,
+		&event.EventDate,
 		&event.CreatedAt,
 		&event.StartedAt,
 		&event.CompletedAt,
@@ -51,7 +52,7 @@ func (r *EventRepository) GetByID(ctx context.Context, id int) (*models.Event, e
 func (r *EventRepository) GetAll(ctx context.Context) ([]models.Event, error) {
 	query := `
 		SELECT id, name, max_picks_per_team, max_teams_per_player,
-		       stipulations, status, passkey, created_at, started_at, completed_at
+		       stipulations, status, passkey, event_date, created_at, started_at, completed_at
 		FROM events
 	`
 
@@ -72,6 +73,7 @@ func (r *EventRepository) GetAll(ctx context.Context) ([]models.Event, error) {
 			&event.Stipulations,
 			&event.Status,
 			&event.Passkey,
+			&event.EventDate,
 			&event.CreatedAt,
 			&event.StartedAt,
 			&event.CompletedAt,
@@ -88,8 +90,8 @@ func (r *EventRepository) GetAll(ctx context.Context) ([]models.Event, error) {
 // Create new record in events table
 func (r *EventRepository) Create(ctx context.Context, event *models.Event) error {
 	query := `
-    INSERT INTO events (name, max_picks_per_team, max_teams_per_player, stipulations, status, passkey)
-    VALUES ($1, $2, $3, $4, $5, $6)
+    INSERT INTO events (name, max_picks_per_team, max_teams_per_player, stipulations, status, passkey, event_date)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
     RETURNING id, created_at
 `
 	err := r.pool.QueryRow(ctx, query,
@@ -99,6 +101,7 @@ func (r *EventRepository) Create(ctx context.Context, event *models.Event) error
 		event.Stipulations,
 		event.Status,
 		event.Passkey,
+		event.EventDate,
 	).Scan(&event.ID, &event.CreatedAt)
 
 	return err
@@ -107,8 +110,8 @@ func (r *EventRepository) Create(ctx context.Context, event *models.Event) error
 // Update record in events table
 func (r *EventRepository) Update(ctx context.Context, event *models.Event) error {
 	query := `
-		UPDATE events SET name=$1, max_picks_per_team=$2, max_teams_per_player=$3, stipulations=$4, status=$5, passkey=$6
-		WHERE id=$7
+		UPDATE events SET name=$1, max_picks_per_team=$2, max_teams_per_player=$3, stipulations=$4, status=$5, passkey=$6, event_date=$7
+		WHERE id=$8
 	`
 
 	commandTag, err := r.pool.Exec(ctx, query,
@@ -118,6 +121,7 @@ func (r *EventRepository) Update(ctx context.Context, event *models.Event) error
 		event.Stipulations,
 		event.Status,
 		event.Passkey,
+		event.EventDate,
 		event.ID,
 	)
 
@@ -156,7 +160,7 @@ func (r *EventRepository) Delete(ctx context.Context, id int) error {
 func (r *EventRepository) GetByPasskey(ctx context.Context, passkey string) (*models.Event, error) {
 	query := `
 		SELECT id, name, max_picks_per_team, max_teams_per_player,
-		       stipulations, status, passkey, created_at, started_at, completed_at
+		       stipulations, status, passkey, event_date, created_at, started_at, completed_at
 		FROM events
 		WHERE passkey = $1
 		ORDER BY id DESC
@@ -172,6 +176,7 @@ func (r *EventRepository) GetByPasskey(ctx context.Context, passkey string) (*mo
 		&event.Stipulations,
 		&event.Status,
 		&event.Passkey,
+		&event.EventDate,
 		&event.CreatedAt,
 		&event.StartedAt,
 		&event.CompletedAt,
@@ -208,4 +213,37 @@ func (r *EventRepository) UpdateStatus(ctx context.Context, eventID int, status 
 	}
 
 	return nil
+}
+
+// GetNextUpcoming returns the next event whose event_date is in the future and status is not_started.
+func (r *EventRepository) GetNextUpcoming(ctx context.Context) (*models.Event, error) {
+	query := `
+		SELECT id, name, max_picks_per_team, max_teams_per_player,
+		       stipulations, status, passkey, event_date, created_at, started_at, completed_at
+		FROM events
+		WHERE event_date > NOW() AND status = 'not_started'
+		ORDER BY event_date ASC
+		LIMIT 1
+	`
+
+	var event models.Event
+	err := r.pool.QueryRow(ctx, query).Scan(
+		&event.ID,
+		&event.Name,
+		&event.MaxPicksPerTeam,
+		&event.MaxTeamsPerPlayer,
+		&event.Stipulations,
+		&event.Status,
+		&event.Passkey,
+		&event.EventDate,
+		&event.CreatedAt,
+		&event.StartedAt,
+		&event.CompletedAt,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &event, nil
 }
