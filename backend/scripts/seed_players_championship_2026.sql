@@ -5,8 +5,8 @@
 BEGIN;
 
 -- Create the event
-INSERT INTO events (name, max_picks_per_team, max_teams_per_player, status, passkey, stipulations)
-VALUES ('The Players Championship 2026', 6, 1, 'not_started', :passkey, '{"tournament": "The Players", "year": 2026}'::jsonb)
+INSERT INTO events (name, max_picks_per_team, max_teams_per_player, status, passkey, event_date, stipulations)
+VALUES ('The Players Championship 2026', 6, 1, 'not_started', :passkey, '2026-03-12 00:00:00-05'::timestamptz, '{"tournament": "The Players", "year": 2026}'::jsonb)
 RETURNING id AS new_event_id;
 
 -- Link players to the event by name
