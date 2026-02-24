@@ -1,5 +1,6 @@
--- Full Seed: Clean slate with Players Championship 2026 data
--- Wipes ALL data (including users) and re-seeds players + event
+-- Full Seed: Clean slate, populates global players table
+-- Wipes ALL data (including users, events) and re-seeds players only
+-- To create an event, run: ./scripts/db.sh new-event seed_players_championship_2026.sql
 -- Usage: psql $DATABASE_URL -f scripts/seed_all.sql
 
 BEGIN;
@@ -7,7 +8,7 @@ BEGIN;
 -- Nuke everything (order matters for foreign keys, CASCADE handles the rest)
 TRUNCATE TABLE draft_results, event_players, users, players, events RESTART IDENTITY CASCADE;
 
--- Insert all 119 players from The Players Championship 2026 field
+-- Insert all players (142 total: 102 in 2026 Players Championship field + 40 others)
 INSERT INTO players (first_name, last_name, status, country_code) VALUES
     ('Scottie', 'Scheffler', 'professional', 'USA'),
     ('Tommy', 'Fleetwood', 'professional', 'ENG'),
@@ -119,23 +120,41 @@ INSERT INTO players (first_name, last_name, status, country_code) VALUES
     ('Nicolai', 'Hojgaard', 'professional', 'DEN'),
     ('Matthieu', 'Pavon', 'professional', 'FRA'),
     ('Gary', 'Woodland', 'professional', 'USA'),
-    ('Joel', 'Dahmen', 'professional', 'USA');
-
--- Create The Players Championship 2026 event
-INSERT INTO events (name, max_picks_per_team, max_teams_per_player, status, passkey, stipulations)
-VALUES ('The Players Championship 2026', 6, 1, 'not_started', 'dye', '{"tournament": "The Players", "year": 2026}'::jsonb);
-
--- Link all players to the event
-INSERT INTO event_players (event_id, player_id)
-SELECT
-    (SELECT id FROM events WHERE name = 'The Players Championship 2026'),
-    id
-FROM players;
+    ('Joel', 'Dahmen', 'professional', 'USA'),
+    ('Jacob', 'Bridgeman', 'professional', 'USA'),
+    ('Matt', 'McCarty', 'professional', 'USA'),
+    ('Sam', 'Stevens', 'professional', 'USA'),
+    ('Ryan', 'Fox', 'professional', 'NZL'),
+    ('Thorbjorn', 'Olesen', 'professional', 'DEN'),
+    ('Max', 'McGreevy', 'professional', 'USA'),
+    ('Sami', 'Valimaki', 'professional', 'FIN'),
+    ('Johnny', 'Keefer', 'professional', 'USA'),
+    ('Alex', 'Smalley', 'professional', 'USA'),
+    ('Marco', 'Penge', 'professional', 'ENG'),
+    ('Ryo', 'Hisatsune', 'professional', 'JPN'),
+    ('Michael', 'Kim', 'professional', 'USA'),
+    ('Vince', 'Whaley', 'professional', 'USA'),
+    ('Michael', 'Brennan', 'professional', 'USA'),
+    ('Kevin', 'Roy', 'professional', 'USA'),
+    ('Garrick', 'Higgo', 'professional', 'RSA'),
+    ('Takumi', 'Kanaya', 'professional', 'JPN'),
+    ('Bud', 'Cauley', 'professional', 'USA'),
+    ('Chad', 'Ramey', 'professional', 'USA'),
+    ('Chandler', 'Phillips', 'professional', 'USA'),
+    ('Steven', 'Fisk', 'professional', 'USA'),
+    ('Brooks', 'Koepka', 'professional', 'USA'),
+    ('Aldrich', 'Potgieter', 'professional', 'RSA'),
+    ('Matti', 'Schmid', 'professional', 'GER'),
+    ('William', 'Mouw', 'professional', 'USA'),
+    ('Karl', 'Vilips', 'professional', 'AUS'),
+    ('Jhonattan', 'Vegas', 'professional', 'VEN'),
+    ('Danny', 'Walker', 'professional', 'USA'),
+    ('Brian', 'Campbell', 'professional', 'USA'),
+    ('Adam', 'Schenk', 'professional', 'USA'),
+    ('Joe', 'Highsmith', 'professional', 'USA');
 
 COMMIT;
 
 -- Summary
 SELECT 'Seed complete' AS status;
 SELECT COUNT(*) AS total_players FROM players;
-SELECT name, status, max_picks_per_team, max_teams_per_player FROM events;
-SELECT COUNT(*) AS players_in_event FROM event_players;

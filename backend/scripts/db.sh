@@ -5,6 +5,7 @@
 # Commands:
 #   draft-reset   Clear draft picks and reset event status (keeps users)
 #   seed          Full re-seed (wipes everything, inserts players + event)
+#   new-event     Create a new event from a seed file (e.g., seed_players_championship_2026.sql)
 #   migrate-up    Run all pending migrations
 #   migrate-down  Roll back ALL migrations
 #   clear-users   Delete all users and draft results, reset event status
@@ -29,6 +30,19 @@ case "${1}" in
     echo "Seeding all data from scratch..."
     psql "$DATABASE_URL" -f "$SCRIPT_DIR/seed_all.sql"
     ;;
+  new-event)
+    if [ -z "$2" ]; then
+      echo "Usage: $0 new-event <seed-file>"
+      echo "Example: $0 new-event seed_players_championship_2026.sql"
+      exit 1
+    fi
+    if [ ! -f "$SCRIPT_DIR/$2" ]; then
+      echo "Error: file not found: $SCRIPT_DIR/$2"
+      exit 1
+    fi
+    echo "Creating new event from $2..."
+    psql "$DATABASE_URL" -f "$SCRIPT_DIR/$2"
+    ;;
   migrate-up)
     echo "Running migrations up..."
     migrate -path "$BACKEND_DIR/migrations" -database "$DATABASE_URL" up
@@ -44,15 +58,16 @@ case "${1}" in
     "$0" seed
     ;;
   *)
-    echo "Usage: $0 {draft-reset|clear-users|seed|migrate-up|migrate-down|fresh}"
+    echo "Usage: $0 {draft-reset|clear-users|seed|new-event|migrate-up|migrate-down|fresh}"
     echo ""
     echo "Commands:"
-    echo "  draft-reset   Clear draft picks, reset event status (keeps users)"
-    echo "  clear-users   Delete all users and draft results, reset event status"
-    echo "  seed          Full re-seed (wipes everything, inserts players + event)"
-    echo "  migrate-up    Run all pending migrations"
-    echo "  migrate-down  Roll back ALL migrations"
-    echo "  fresh         Full rebuild: drop schema → migrate → seed"
+    echo "  draft-reset              Clear draft picks, reset event status (keeps users)"
+    echo "  clear-users              Delete all users and draft results, reset event status"
+    echo "  seed                     Full re-seed (wipes everything, inserts players + event)"
+    echo "  new-event <seed-file>    Create a new event from a seed file"
+    echo "  migrate-up               Run all pending migrations"
+    echo "  migrate-down             Roll back ALL migrations"
+    echo "  fresh                    Full rebuild: drop schema → migrate → seed"
     exit 1
     ;;
 esac
