@@ -31,17 +31,17 @@ case "${1}" in
     psql "$DATABASE_URL" -f "$SCRIPT_DIR/seed_all.sql"
     ;;
   new-event)
-    if [ -z "$2" ]; then
-      echo "Usage: $0 new-event <seed-file>"
-      echo "Example: $0 new-event seed_players_championship_2026.sql"
+    if [ -z "$2" ] || [ -z "$3" ]; then
+      echo "Usage: $0 new-event <seed-file> <passkey>"
+      echo "Example: $0 new-event seed_players_championship_2026.sql dye"
       exit 1
     fi
     if [ ! -f "$SCRIPT_DIR/$2" ]; then
       echo "Error: file not found: $SCRIPT_DIR/$2"
       exit 1
     fi
-    echo "Creating new event from $2..."
-    psql "$DATABASE_URL" -f "$SCRIPT_DIR/$2"
+    echo "Creating new event from $2 with passkey '$3'..."
+    psql "$DATABASE_URL" -v passkey="'$3'" -f "$SCRIPT_DIR/$2"
     ;;
   migrate-up)
     echo "Running migrations up..."
