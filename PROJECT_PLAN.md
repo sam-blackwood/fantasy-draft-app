@@ -204,7 +204,10 @@ This approach works because:
 - [x] Console `autopick()` command correctly flags picks as auto-drafted
 - [x] Handle reconnection gracefully (auto-reconnect with exponential backoff, reconnection banner UI)
 - [x] Light/dark mode support
-- [ ] Mobile-responsive design
+- [x] Mobile-responsive design
+- [x] Homepage with tab navigation (Home / Join Draft) and theme toggle
+- [x] Countdown timer page with live countdown to next event (`CountdownPage.tsx`)
+- [x] Event date support (migration 000007, `event_date` column, `/api/events/next` endpoint)
 
 ### Phase 4: Polish & Deploy (Week 4)
 - [ ] End-to-end testing with real draft scenarios
@@ -333,4 +336,4 @@ This approach works because:
 
 ---
 
-**Last Updated:** February 24, 2026 (Event management scripts, per-event seed files, operational runbook)
+**Last Updated:** February 24, 2026 (Homepage with countdown timer, event date support, tab navigation)
