@@ -276,7 +276,7 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
                       {draftedBy && <span className="ml-2 text-xs text-content-tertiary">{draftedBy}</span>}
                     </td>
                     <td className="py-2">{player.countryCode}</td>
-                    <td className="py-2 text-right pr-2">
+                    <td className="py-2 text-right pr-2 h-[26px]">
                       {canPick && (
                         <button
                           onClick={() => onPickPlayer(player.id)}
