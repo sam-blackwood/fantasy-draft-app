@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { getEvent, getUsers } from '../api/client';
 import { DraftOrder } from '../components/DraftOrder';
+import { Lobby } from '../components/Lobby';
 import { DraftResults } from '../components/DraftResults';
 import { DraftTimer } from '../components/DraftTimer';
 import { PlayerList } from '../components/PlayerList';
@@ -147,25 +148,7 @@ export function DraftRoom() {
             </div>
 
             {/* Users */}
-            <div className="mb-4 p-4 bg-surface rounded">
-              <h2 className="font-semibold mb-2">Lobby</h2>
-              <div className="space-y-1 text-sm">
-                {registeredUsers.map((user) => {
-                  const isMe = user.id === userID;
-                  const isConnected = isMe || connectedUsers.some((u) => u.id === user.id);
-                  return (
-                    <div key={user.id} className="flex items-center gap-2">
-                      <span className={isConnected ? 'text-content-primary' : 'text-content-muted'}>
-                        {user.username}
-                      </span>
-                      <span className={`text-xs ${isMe ? 'text-accent-bright' : isConnected ? 'text-green-400' : 'text-content-muted'}`}>
-                        ({isMe ? 'You' : isConnected ? 'Active' : 'Inactive'})
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
+            <Lobby registeredUsers={registeredUsers} connectedUsers={connectedUsers} userID={userID} />
           </>
         ) : isDraftComplete ? (
           <div className="mb-4 p-8 bg-surface rounded text-center">
