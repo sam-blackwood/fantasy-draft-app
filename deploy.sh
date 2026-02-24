@@ -18,6 +18,9 @@ cd frontend
 npm run build
 cd ..
 
+echo "=== Stopping service ==="
+ssh -i "$KEY" "${SERVER_USER}@${SERVER_IP}" "sudo systemctl stop fantasy-draft"
+
 echo "=== Uploading to server ==="
 scp -i "$KEY" server "${SERVER_USER}@${SERVER_IP}:${REMOTE_DIR}/server"
 rsync -avz -e "ssh -i $KEY" frontend/dist/ "${SERVER_USER}@${SERVER_IP}:${REMOTE_DIR}/static/"
