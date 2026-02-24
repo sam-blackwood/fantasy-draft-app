@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { joinDraft } from '../api/client';
-import { ThemeToggle } from '../components/ThemeToggle';
 import { useLocalStore } from '../store/localStore';
 
 export function JoinPage() {
@@ -26,10 +25,7 @@ export function JoinPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surface-base text-content-primary px-4">
-      <div className="fixed top-4 right-4">
-        <ThemeToggle />
-      </div>
+    <div className="flex-1 flex items-center justify-center px-4">
       <form
         onSubmit={(e) => { e.preventDefault(); handleJoin(); }}
         className="bg-surface p-8 rounded-lg shadow-lg max-w-md w-full"

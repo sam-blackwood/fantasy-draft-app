@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { JoinPage } from './pages/JoinPage';
+import { HomePage } from './pages/HomePage';
 import { DraftRoom } from './pages/DraftRoom';
 import { useLocalStore } from './store/localStore';
 
@@ -14,7 +14,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<JoinPage />} />
+        <Route path="/" element={<HomePage />} />
         <Route path="/draft" element={<DraftRoom />} />
       </Routes>
     </BrowserRouter>

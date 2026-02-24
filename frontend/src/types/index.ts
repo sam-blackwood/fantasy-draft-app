@@ -7,6 +7,7 @@ export interface Event {
   maxTeamsPerPlayer: number;
   stipulations: Record<string, unknown>;
   status: 'pending' | 'in_progress' | 'completed';
+  eventDate?: string;
   createdAt: string;
   startedAt: string | null;
   completedAt: string | null;

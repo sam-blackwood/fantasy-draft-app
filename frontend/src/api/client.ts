@@ -33,6 +33,10 @@ export async function getEvent(id: number): Promise<Event> {
   return fetchJSON<Event>(`/events/${id}`);
 }
 
+export async function getNextEvent(): Promise<Event | null> {
+  return fetchJSON<Event | null>('/events/next');
+}
+
 export async function getPlayers(): Promise<Player[]> {
   return fetchJSON<Player[]>('/players');
 }
