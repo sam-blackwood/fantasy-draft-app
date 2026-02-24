@@ -159,6 +159,8 @@ func (r *EventRepository) GetByPasskey(ctx context.Context, passkey string) (*mo
 		       stipulations, status, passkey, created_at, started_at, completed_at
 		FROM events
 		WHERE passkey = $1
+		ORDER BY id DESC
+		LIMIT 1
 	`
 
 	var event models.Event
