@@ -152,7 +152,7 @@ export function DraftRoom() {
           </>
         ) : isDraftComplete ? (
           <div className="mb-4 p-8 bg-surface rounded text-center">
-            <h2 className="text-xl font-semibold mb-2">Draft Complete</h2>
+            <h2 className="text-xl font-semibold mb-2 text-highlight-text">Draft Complete</h2>
           </div>
         ) : (
           <>
