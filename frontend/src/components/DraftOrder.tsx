@@ -41,7 +41,7 @@ export function DraftOrder() {
     <div className="flex items-center gap-1">
       <button
         onClick={() => scrollBy(-1)}
-        className="shrink-0 p-1 text-content-tertiary hover:text-white"
+        className="shrink-0 p-1 text-content-tertiary hover:text-content-primary"
         aria-label="Scroll left"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -83,7 +83,7 @@ export function DraftOrder() {
                 className={`text-sm font-medium ${
                   isConnected
                     ? isCurrent
-                      ? "text-white"
+                      ? "text-content-primary"
                       : "text-content-secondary"
                     : "text-content-disabled"
                 }`}
@@ -97,7 +97,7 @@ export function DraftOrder() {
 
       <button
         onClick={() => scrollBy(1)}
-        className="shrink-0 p-1 text-content-tertiary hover:text-white"
+        className="shrink-0 p-1 text-content-tertiary hover:text-content-primary"
         aria-label="Scroll right"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

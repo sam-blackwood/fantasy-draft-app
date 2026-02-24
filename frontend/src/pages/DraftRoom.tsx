@@ -7,6 +7,7 @@ import { PlayerList } from '../components/PlayerList';
 import { TeamRoster } from '../components/TeamRoster';
 import { useDraftAdmin } from '../hooks/useDraftAdmin';
 import { useWebSocket } from '../hooks/useWebSocket';
+import { ThemeToggle } from '../components/ThemeToggle';
 import { useDraftStore } from '../store/draftStore';
 import { useLocalStore } from '../store/localStore';
 import { usePlayerStore } from '../store/playerStore';
@@ -91,11 +92,12 @@ export function DraftRoom() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-base text-white p-4">
+    <div className="min-h-screen bg-surface-base text-content-primary p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">{eventName} Draft</h1>
+          <h1 className="text-2xl font-bold text-highlight-text">{eventName} Draft</h1>
+          <ThemeToggle />
         </div>
 
         {/* Reconnection Banner */}
@@ -138,7 +140,7 @@ export function DraftRoom() {
           <>
             {/* Waiting Banner */}
             <div className="mb-4 p-8 bg-surface rounded text-center">
-              <h2 className="text-xl font-semibold mb-2">Waiting for draft to start...</h2>
+              <h2 className="text-xl font-semibold mb-2 text-highlight-text">Waiting for draft to start...</h2>
               <p className="text-content-tertiary text-sm">
                 The draft admin will start the draft once everyone is ready.
               </p>
@@ -153,7 +155,7 @@ export function DraftRoom() {
                   const isConnected = isMe || connectedUsers.some((u) => u.id === user.id);
                   return (
                     <div key={user.id} className="flex items-center gap-2">
-                      <span className={isConnected ? 'text-white' : 'text-content-muted'}>
+                      <span className={isConnected ? 'text-content-primary' : 'text-content-muted'}>
                         {user.username}
                       </span>
                       <span className={`text-xs ${isMe ? 'text-accent-bright' : isConnected ? 'text-green-400' : 'text-content-muted'}`}>
@@ -178,8 +180,8 @@ export function DraftRoom() {
 
             {/* Draft Status + Timer */}
             <div className="mb-4 p-4 bg-surface rounded flex items-center justify-between">
-              <div className="text-xl font-semibold">
-                Round <span className="text-accent-bright">{roundNumber}</span>
+              <div className="text-xl font-semibold text-highlight-text">
+                Round <span className="text-highlight-text">{roundNumber}</span>
               </div>
               <DraftTimer />
             </div>
@@ -193,7 +195,7 @@ export function DraftRoom() {
             <select
               value={viewTeamID ?? ''}
               onChange={(e) => setViewTeamID(e.target.value ? Number(e.target.value) : null)}
-              className="w-full mb-3 px-2 py-1 bg-surface-input border border-edge-input rounded text-sm text-white"
+              className="w-full mb-3 px-2 py-1 bg-surface-input border border-edge-input rounded text-sm text-content-primary"
             >
               <option value="">My Team</option>
               {registeredUsers

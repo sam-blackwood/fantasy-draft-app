@@ -1,26 +1,57 @@
 @import "tailwindcss";
 
 @theme {
-  /* ── Surface (backgrounds) ── */
-  --color-surface-base: #091408;
-  --color-surface: #12261a;
-  --color-surface-input: #1a3324;
-  --color-surface-hover: #24422e;
+  /* ── Surface (backgrounds) ── neutral darks ── */
+  --color-surface-base: #111113;
+  --color-surface: #1c1c20;
+  --color-surface-input: #26262b;
+  --color-surface-hover: #333338;
 
   /* ── Edges (borders) ── */
-  --color-edge: #24422e;
-  --color-edge-input: #2f5339;
+  --color-edge: #2e2e34;
+  --color-edge-input: #3a3a42;
 
-  /* ── Accent (primary interactive) ── */
-  --color-accent: #16a34a;
-  --color-accent-hover: #15803d;
+  /* ── Highlight (section headers, accented areas) ── */
+  --color-highlight: #113b1e;
+  --color-highlight-text: #4ade80;
+
+  /* ── Accent (green — golf) ── */
+  --color-accent: #22c55e;
+  --color-accent-hover: #16a34a;
   --color-accent-bright: #4ade80;
   --color-accent-soft: #bbf7d0;
-  --color-accent-focus: #22c55e;
+  --color-accent-focus: #34d399;
 
   /* ── Content (text) ── */
+  --color-content-primary: #ffffff;
   --color-content-secondary: #d1d5db;
   --color-content-tertiary: #9ca3af;
   --color-content-muted: #6b7280;
   --color-content-disabled: #4b5563;
+}
+
+/* ── Light theme overrides ── */
+.light {
+  --color-surface-base: #dddde2;
+  --color-surface: #e4e4e9;
+  --color-surface-input: #d5d5dc;
+  --color-surface-hover: #cacacf;
+
+  --color-edge: #c8c8d0;
+  --color-edge-input: #b8b8c2;
+
+  --color-highlight: #dcfce7;
+  --color-highlight-text: #15803d;
+
+  --color-accent: #16a34a;
+  --color-accent-hover: #15803d;
+  --color-accent-bright: #16a34a;
+  --color-accent-soft: #166534;
+  --color-accent-focus: #059669;
+
+  --color-content-primary: #111113;
+  --color-content-secondary: #374151;
+  --color-content-tertiary: #6b7280;
+  --color-content-muted: #9ca3af;
+  --color-content-disabled: #d1d5db;
 }

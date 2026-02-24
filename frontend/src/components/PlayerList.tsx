@@ -166,7 +166,7 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
         <select
           value={playerFilter}
           onChange={(e) => setPlayerFilter(e.target.value as 'available' | 'drafted' | 'all')}
-          className="px-2 py-1 bg-surface-input border border-edge-input rounded text-sm text-white"
+          className="px-2 py-1 bg-surface-input border border-edge-input rounded text-sm text-content-primary"
         >
           <option value="available">Available</option>
           <option value="drafted">Drafted</option>
@@ -180,7 +180,7 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
           value={searchFilter}
           onChange={(e) => setSearchFilter(e.target.value)}
           placeholder="Search players..."
-          className="flex-1 px-3 py-2 bg-surface-input border border-edge-input rounded text-sm text-white placeholder-content-tertiary focus:outline-none focus:border-accent-focus"
+          className="flex-1 px-3 py-2 bg-surface-input border border-edge-input rounded text-sm text-content-primary placeholder-content-tertiary focus:outline-none focus:border-accent-focus"
         />
 
         {countryCodes.length > 0 && (
@@ -189,7 +189,7 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
               onClick={() => setCountryDropdownOpen((prev) => !prev)}
               className="w-full px-3 py-2 bg-surface-input border border-edge-input rounded text-sm text-left flex items-center justify-between"
             >
-              <span className={`truncate ${countryCodeFilter ? 'text-white' : 'text-content-tertiary'}`}>
+              <span className={`truncate ${countryCodeFilter ? 'text-content-primary' : 'text-content-tertiary'}`}>
                 {countryCodeFilter
                   ? countryCodeFilter.join(', ')
                   : 'Filter by country'}
@@ -245,13 +245,13 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
             <thead className="sticky top-0 bg-surface">
               <tr className="text-left text-content-tertiary border-b border-edge">
                 <th className="pb-2">
-                  <button onClick={() => toggleSort('name')} className="relative hover:text-white cursor-pointer">
+                  <button onClick={() => toggleSort('name')} className="relative hover:text-content-primary cursor-pointer">
                     Name
                     {sortConfig?.sortField === 'name' && <span className="absolute -right-3 top-1/2 -translate-y-1/2 text-[10px] text-accent-bright">{sortConfig.sortDirection === 'asc' ? '\u25B2' : '\u25BC'}</span>}
                   </button>
                 </th>
                 <th className="pb-2">
-                  <button onClick={() => toggleSort('countryCode')} className="relative hover:text-white cursor-pointer">
+                  <button onClick={() => toggleSort('countryCode')} className="relative hover:text-content-primary cursor-pointer">
                     Country
                     {sortConfig?.sortField === 'countryCode' && <span className="absolute -right-3 top-1/2 -translate-y-1/2 text-[10px] text-accent-bright">{sortConfig.sortDirection === 'asc' ? '\u25B2' : '\u25BC'}</span>}
                   </button>
@@ -280,7 +280,7 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
                       {canPick && (
                         <button
                           onClick={() => onPickPlayer(player.id)}
-                          className="px-2 py-1 text-accent-bright hover:text-white hover:bg-accent rounded text-xs font-medium cursor-pointer"
+                          className="px-2 py-1 text-accent-bright hover:text-content-primary hover:bg-accent rounded text-xs font-medium cursor-pointer"
                         >
                           Draft
                         </button>

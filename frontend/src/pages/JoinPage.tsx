@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { joinDraft } from '../api/client';
+import { ThemeToggle } from '../components/ThemeToggle';
 import { useLocalStore } from '../store/localStore';
 
 export function JoinPage() {
@@ -25,7 +26,10 @@ export function JoinPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surface-base text-white">
+    <div className="min-h-screen flex items-center justify-center bg-surface-base text-content-primary">
+      <div className="fixed top-4 right-4">
+        <ThemeToggle />
+      </div>
       <form
         onSubmit={(e) => { e.preventDefault(); handleJoin(); }}
         className="bg-surface p-8 rounded-lg shadow-lg max-w-md w-full"
@@ -39,7 +43,7 @@ export function JoinPage() {
             value={teamName}
             onChange={(e) => setTeamName(e.target.value)}
             placeholder="Enter Team Name"
-            className="w-full px-4 py-3 bg-surface-input border border-edge-input rounded-lg text-white placeholder-content-tertiary focus:outline-none focus:border-accent-focus focus:ring-1 focus:ring-accent-focus"
+            className="w-full px-4 py-3 bg-surface-input border border-edge-input rounded-lg text-content-primary placeholder-content-tertiary focus:outline-none focus:border-accent-focus focus:ring-1 focus:ring-accent-focus"
           />
         </div>
 
@@ -50,7 +54,7 @@ export function JoinPage() {
             value={passKey}
             onChange={(e) => setPassKey(e.target.value)}
             placeholder="Enter Passkey"
-            className="w-full px-4 py-3 bg-surface-input border border-edge-input rounded-lg text-white placeholder-content-tertiary focus:outline-none focus:border-accent-focus focus:ring-1 focus:ring-accent-focus"
+            className="w-full px-4 py-3 bg-surface-input border border-edge-input rounded-lg text-content-primary placeholder-content-tertiary focus:outline-none focus:border-accent-focus focus:ring-1 focus:ring-accent-focus"
           />
         </div>
 
