@@ -56,6 +56,26 @@ func (h *UserHandler) ListUsers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(users)
 }
 
+// ListEventUsers handles GET /events/{id}/users
+func (h *UserHandler) ListEventUsers(w http.ResponseWriter, r *http.Request) {
+	idStr := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, `{"error": "invalid event ID"}`, http.StatusBadRequest)
+		return
+	}
+
+	users, err := h.repo.GetByEventID(r.Context(), id)
+	if err != nil {
+		http.Error(w, `{"error": "internal server error"}`, http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(users)
+}
+
 // CreateUser handles POST /users
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User

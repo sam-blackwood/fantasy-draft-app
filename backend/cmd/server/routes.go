@@ -68,6 +68,9 @@ func setupRoutes(r *chi.Mux, db *database.DB, deps *Dependencies) {
 	r.Put("/users/{id}", deps.User.UpdateUser)
 	r.Delete("/users/{id}", deps.User.DeleteUser)
 
+	// Event users routes
+	r.Get("/events/{id}/users", deps.User.ListEventUsers)
+
 	// Event players routes
 	r.Get("/events/{id}/players", deps.EventPlayer.GetEventPlayers)
 	r.Post("/events/{id}/players", deps.EventPlayer.AddEventPlayers)

@@ -150,6 +150,38 @@ func (r *UserRepository) GetByEventAndUsername(ctx context.Context, eventID int,
 	return &user, nil
 }
 
+// GetByEventID retrieves all users for a specific event
+func (r *UserRepository) GetByEventID(ctx context.Context, eventID int) ([]models.User, error) {
+	query := `
+		SELECT id, event_id, username, created_at
+		FROM users
+		WHERE event_id = $1
+	`
+
+	rows, err := r.pool.Query(ctx, query, eventID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	users := []models.User{}
+	for rows.Next() {
+		var user models.User
+		err := rows.Scan(
+			&user.ID,
+			&user.EventID,
+			&user.Username,
+			&user.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
 // CountByEvent returns the number of users registered for an event
 func (r *UserRepository) CountByEvent(ctx context.Context, eventID int) (int, error) {
 	query := `SELECT COUNT(*) FROM users WHERE event_id = $1`
