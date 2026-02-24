@@ -37,16 +37,16 @@ export function DraftRoom() {
   const initializeEventPlayers = usePlayerStore((s) => s.setEventPlayers);
   const setRegisteredUsers = useDraftStore((s) => s.setRegisteredUsers);
 
-  // Fetch registered users then connect WebSocket
+  // Fetch registered users for this event then connect WebSocket
   useEffect(() => {
-    getUsers()
+    getUsers(eventID ?? undefined)
       .then((users) => {
         setRegisteredUsers(users);
         connect();
       })
       .catch((err) => console.error('Failed to fetch users:', err));
     return () => disconnect();
-  }, [connect, disconnect, setRegisteredUsers]);
+  }, [connect, disconnect, setRegisteredUsers, eventID]);
 
   // Fetch event name
   useEffect(() => {

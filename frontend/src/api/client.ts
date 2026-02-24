@@ -41,7 +41,10 @@ export async function getPlayer(id: number): Promise<Player> {
   return fetchJSON<Player>(`/players/${id}`);
 }
 
-export async function getUsers(): Promise<User[]> {
+export async function getUsers(eventID?: number): Promise<User[]> {
+  if (eventID != null) {
+    return fetchJSON<User[]>(`/events/${eventID}/users`);
+  }
   return fetchJSON<User[]>('/users');
 }
 
