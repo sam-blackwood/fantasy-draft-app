@@ -36,6 +36,7 @@ backend/tmp/
 backend/build-errors.log
 
 # Go binaries
+server
 backend/server
 backend/cmd/server/server
 backend/cmd/seed/seed
