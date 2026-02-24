@@ -32,7 +32,7 @@ export function TeamRoster({ viewUserID }: TeamRosterProps) {
     <div>
       {/* Roster list */}
       {picks.length === 0 ? (
-        <p className="text-gray-500 text-sm text-center py-4">No picks yet</p>
+        <p className="text-content-muted text-sm text-center py-4">No picks yet</p>
       ) : (
         <div className="space-y-3 overflow-y-auto">
           {picks.map((pick) => (
@@ -40,7 +40,7 @@ export function TeamRoster({ viewUserID }: TeamRosterProps) {
               key={pick.pickNumber}
               className="flex items-start gap-3 px-2 py-2"
             >
-              <span className="text-gray-500 text-sm font-medium w-5 text-right shrink-0">
+              <span className="text-content-muted text-sm font-medium w-5 text-right shrink-0">
                 {pick.pickNumber}
               </span>
               <div className="min-w-0">
@@ -52,7 +52,7 @@ export function TeamRoster({ viewUserID }: TeamRosterProps) {
                     <span className="text-yellow-500 text-xs">(auto)</span>
                   )}
                 </div>
-                <div className="text-gray-400 text-xs">
+                <div className="text-content-tertiary text-xs">
                   {pick.player?.countryCode}
                 </div>
               </div>

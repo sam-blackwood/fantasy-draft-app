@@ -83,7 +83,7 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
    * - search filter value
    * - country code filter value
    * - applied sort
-   * 
+   *
    * @returns The ordered list of players to show in the UI.
    */
   function getDisplayedPlayers(): Player[] {
@@ -132,7 +132,7 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
 
   /**
    * Toggles the sort state of a given field.
-   * 
+   *
    * @param field Field to toggle sort against
    */
   function toggleSort(field: 'name' | 'countryCode') {
@@ -160,13 +160,13 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
   }
 
   return (
-    <div className="p-4 bg-gray-800 rounded flex flex-col max-h-[70vh]">
+    <div className="p-4 bg-surface rounded flex flex-col max-h-[70vh]">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-semibold">Players ({displayedPlayers.length})</h2>
         <select
           value={playerFilter}
           onChange={(e) => setPlayerFilter(e.target.value as 'available' | 'drafted' | 'all')}
-          className="px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm text-white"
+          className="px-2 py-1 bg-surface-input border border-edge-input rounded text-sm text-white"
         >
           <option value="available">Available</option>
           <option value="drafted">Drafted</option>
@@ -180,29 +180,29 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
           value={searchFilter}
           onChange={(e) => setSearchFilter(e.target.value)}
           placeholder="Search players..."
-          className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
+          className="flex-1 px-3 py-2 bg-surface-input border border-edge-input rounded text-sm text-white placeholder-content-tertiary focus:outline-none focus:border-accent-focus"
         />
 
         {countryCodes.length > 0 && (
           <div className="relative w-48" ref={countryDropdownRef}>
             <button
               onClick={() => setCountryDropdownOpen((prev) => !prev)}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-sm text-left flex items-center justify-between"
+              className="w-full px-3 py-2 bg-surface-input border border-edge-input rounded text-sm text-left flex items-center justify-between"
             >
-              <span className={`truncate ${countryCodeFilter ? 'text-white' : 'text-gray-400'}`}>
+              <span className={`truncate ${countryCodeFilter ? 'text-white' : 'text-content-tertiary'}`}>
                 {countryCodeFilter
                   ? countryCodeFilter.join(', ')
                   : 'Filter by country'}
               </span>
-              <span className="text-gray-400 text-xs">{countryDropdownOpen ? '\u25B2' : '\u25BC'}</span>
+              <span className="text-content-tertiary text-xs">{countryDropdownOpen ? '\u25B2' : '\u25BC'}</span>
             </button>
             {countryDropdownOpen && (
-              <div className="absolute z-10 mt-1 w-full bg-gray-700 border border-gray-600 rounded shadow-lg max-h-48 overflow-y-auto">
+              <div className="absolute z-10 mt-1 w-full bg-surface-input border border-edge-input rounded shadow-lg max-h-48 overflow-y-auto">
                 {countryCodeFilter && (
-                  <div className="flex border-b border-gray-600">
+                  <div className="flex border-b border-edge-input">
                     <button
                       onClick={() => setCountryCodeFilter(null)}
-                      className="flex-1 px-3 py-2 text-sm text-red-400 hover:bg-gray-600 text-left"
+                      className="flex-1 px-3 py-2 text-sm text-red-400 hover:bg-surface-hover text-left"
                     >
                       Clear
                     </button>
@@ -211,7 +211,7 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
                         const inverted = countryCodes.filter((c) => !countryCodeFilter.includes(c));
                         setCountryCodeFilter(inverted.length > 0 ? inverted : null);
                       }}
-                      className="flex-1 px-3 py-2 text-sm text-blue-400 hover:bg-gray-600 text-left"
+                      className="flex-1 px-3 py-2 text-sm text-accent-bright hover:bg-surface-hover text-left"
                     >
                       Invert
                     </button>
@@ -220,7 +220,7 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
                 {countryCodes.map((code) => (
                   <label
                     key={code}
-                    className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-600 cursor-pointer"
+                    className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-surface-hover cursor-pointer"
                   >
                     <input
                       type="checkbox"
@@ -238,22 +238,22 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
       </div>
 
       {displayedPlayers.length === 0 ? (
-        <p className="text-gray-400 text-sm">No players loaded.</p>
+        <p className="text-content-tertiary text-sm">No players loaded.</p>
       ) : (
         <div className="overflow-y-auto flex-1 min-h-0">
           <table className="w-full text-sm">
-            <thead className="sticky top-0 bg-gray-800">
-              <tr className="text-left text-gray-400 border-b border-gray-700">
+            <thead className="sticky top-0 bg-surface">
+              <tr className="text-left text-content-tertiary border-b border-edge">
                 <th className="pb-2">
                   <button onClick={() => toggleSort('name')} className="relative hover:text-white cursor-pointer">
                     Name
-                    {sortConfig?.sortField === 'name' && <span className="absolute -right-3 top-1/2 -translate-y-1/2 text-[10px] text-blue-400">{sortConfig.sortDirection === 'asc' ? '\u25B2' : '\u25BC'}</span>}
+                    {sortConfig?.sortField === 'name' && <span className="absolute -right-3 top-1/2 -translate-y-1/2 text-[10px] text-accent-bright">{sortConfig.sortDirection === 'asc' ? '\u25B2' : '\u25BC'}</span>}
                   </button>
                 </th>
                 <th className="pb-2">
                   <button onClick={() => toggleSort('countryCode')} className="relative hover:text-white cursor-pointer">
                     Country
-                    {sortConfig?.sortField === 'countryCode' && <span className="absolute -right-3 top-1/2 -translate-y-1/2 text-[10px] text-blue-400">{sortConfig.sortDirection === 'asc' ? '\u25B2' : '\u25BC'}</span>}
+                    {sortConfig?.sortField === 'countryCode' && <span className="absolute -right-3 top-1/2 -translate-y-1/2 text-[10px] text-accent-bright">{sortConfig.sortDirection === 'asc' ? '\u25B2' : '\u25BC'}</span>}
                   </button>
                 </th>
                 <th className="pb-2 w-16"></th>
@@ -266,21 +266,21 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
                 return (
                   <tr
                     key={player.id}
-                    className={`border-b border-gray-700/50 odd:bg-gray-700/30 ${draftedBy ? 'opacity-40' : ''}`}
+                    className={`border-b border-edge/50 odd:bg-surface-input/30 ${draftedBy ? 'opacity-40' : ''}`}
                   >
                     <td className="py-2">
                       <span className={draftedBy ? 'line-through' : ''}>
                         {player.firstName} {player.lastName}
                       </span>
                       {player.status === 'amateur' && <span className="ml-1 text-xs text-yellow-400">(a)</span>}
-                      {draftedBy && <span className="ml-2 text-xs text-gray-400">{draftedBy}</span>}
+                      {draftedBy && <span className="ml-2 text-xs text-content-tertiary">{draftedBy}</span>}
                     </td>
                     <td className="py-2">{player.countryCode}</td>
                     <td className="py-2 text-right pr-2">
                       {canPick && (
                         <button
                           onClick={() => onPickPlayer(player.id)}
-                          className="px-2 py-1 text-blue-400 hover:text-white hover:bg-blue-600 rounded text-xs font-medium cursor-pointer"
+                          className="px-2 py-1 text-accent-bright hover:text-white hover:bg-accent rounded text-xs font-medium cursor-pointer"
                         >
                           Draft
                         </button>

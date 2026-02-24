@@ -41,7 +41,7 @@ export function DraftOrder() {
     <div className="flex items-center gap-1">
       <button
         onClick={() => scrollBy(-1)}
-        className="shrink-0 p-1 text-gray-400 hover:text-white"
+        className="shrink-0 p-1 text-content-tertiary hover:text-white"
         aria-label="Scroll left"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -67,14 +67,14 @@ export function DraftOrder() {
               className={`flex-shrink-0 px-3 py-2 rounded text-center border transition-colors min-w-[72px] ${
                 isCurrent
                   ? isConnected
-                    ? "bg-blue-600 border-blue-400"
-                    : "bg-gray-800 border-blue-400"
-                  : "bg-gray-800 border-gray-700"
+                    ? "bg-accent border-accent-bright"
+                    : "bg-surface border-accent-bright"
+                  : "bg-surface border-edge"
               }`}
             >
               <div
                 className={`text-xs ${
-                  isCurrent ? "text-blue-200" : "text-gray-500"
+                  isCurrent ? "text-accent-soft" : "text-content-muted"
                 }`}
               >
                 Pick {pickNumber}
@@ -84,8 +84,8 @@ export function DraftOrder() {
                   isConnected
                     ? isCurrent
                       ? "text-white"
-                      : "text-gray-300"
-                    : "text-gray-600"
+                      : "text-content-secondary"
+                    : "text-content-disabled"
                 }`}
               >
                 {user?.username ?? `User ${userID}`}
@@ -97,7 +97,7 @@ export function DraftOrder() {
 
       <button
         onClick={() => scrollBy(1)}
-        className="shrink-0 p-1 text-gray-400 hover:text-white"
+        className="shrink-0 p-1 text-content-tertiary hover:text-white"
         aria-label="Scroll right"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

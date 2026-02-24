@@ -40,7 +40,7 @@ export function DraftTimer() {
   const display = `${mins}:${secs.toString().padStart(2, '0')}`;
 
   const colorClass =
-    isPaused ? 'text-gray-400'
+    isPaused ? 'text-content-tertiary'
     : secondsLeft <= 10 ? 'text-red-500'
     : 'text-green-500';
 
@@ -50,7 +50,7 @@ export function DraftTimer() {
         {display}
       </div>
       {isPaused && (
-        <div className="text-sm text-gray-400 mt-1">PAUSED</div>
+        <div className="text-sm text-content-tertiary mt-1">PAUSED</div>
       )}
     </div>
   );

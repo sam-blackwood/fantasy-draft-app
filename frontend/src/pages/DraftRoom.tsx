@@ -91,7 +91,7 @@ export function DraftRoom() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-4">
+    <div className="min-h-screen bg-surface-base text-white p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
@@ -137,15 +137,15 @@ export function DraftRoom() {
         {isPreDraft ? (
           <>
             {/* Waiting Banner */}
-            <div className="mb-4 p-8 bg-gray-800 rounded text-center">
+            <div className="mb-4 p-8 bg-surface rounded text-center">
               <h2 className="text-xl font-semibold mb-2">Waiting for draft to start...</h2>
-              <p className="text-gray-400 text-sm">
+              <p className="text-content-tertiary text-sm">
                 The draft admin will start the draft once everyone is ready.
               </p>
             </div>
 
             {/* Users */}
-            <div className="mb-4 p-4 bg-gray-800 rounded">
+            <div className="mb-4 p-4 bg-surface rounded">
               <h2 className="font-semibold mb-2">Lobby</h2>
               <div className="space-y-1 text-sm">
                 {registeredUsers.map((user) => {
@@ -153,10 +153,10 @@ export function DraftRoom() {
                   const isConnected = isMe || connectedUsers.some((u) => u.id === user.id);
                   return (
                     <div key={user.id} className="flex items-center gap-2">
-                      <span className={isConnected ? 'text-white' : 'text-gray-500'}>
+                      <span className={isConnected ? 'text-white' : 'text-content-muted'}>
                         {user.username}
                       </span>
-                      <span className={`text-xs ${isMe ? 'text-blue-400' : isConnected ? 'text-green-400' : 'text-gray-500'}`}>
+                      <span className={`text-xs ${isMe ? 'text-accent-bright' : isConnected ? 'text-green-400' : 'text-content-muted'}`}>
                         ({isMe ? 'You' : isConnected ? 'Active' : 'Inactive'})
                       </span>
                     </div>
@@ -166,7 +166,7 @@ export function DraftRoom() {
             </div>
           </>
         ) : isDraftComplete ? (
-          <div className="mb-4 p-8 bg-gray-800 rounded text-center">
+          <div className="mb-4 p-8 bg-surface rounded text-center">
             <h2 className="text-xl font-semibold mb-2">Draft Complete</h2>
           </div>
         ) : (
@@ -177,9 +177,9 @@ export function DraftRoom() {
             </div>
 
             {/* Draft Status + Timer */}
-            <div className="mb-4 p-4 bg-gray-800 rounded flex items-center justify-between">
+            <div className="mb-4 p-4 bg-surface rounded flex items-center justify-between">
               <div className="text-xl font-semibold">
-                Round <span className="text-blue-400">{roundNumber}</span>
+                Round <span className="text-accent-bright">{roundNumber}</span>
               </div>
               <DraftTimer />
             </div>
@@ -189,11 +189,11 @@ export function DraftRoom() {
         {/* Three-panel layout: My Team | Available Golfers | Pick History */}
         <div className="grid grid-cols-[280px_1fr_280px] gap-4">
           {/* Left: Team Roster */}
-          <div className="bg-gray-800 rounded p-4 overflow-y-auto max-h-[calc(100vh-300px)]">
+          <div className="bg-surface rounded p-4 overflow-y-auto max-h-[calc(100vh-300px)]">
             <select
               value={viewTeamID ?? ''}
               onChange={(e) => setViewTeamID(e.target.value ? Number(e.target.value) : null)}
-              className="w-full mb-3 px-2 py-1 bg-gray-700 border border-gray-600 rounded text-sm text-white"
+              className="w-full mb-3 px-2 py-1 bg-surface-input border border-edge-input rounded text-sm text-white"
             >
               <option value="">My Team</option>
               {registeredUsers
@@ -211,7 +211,7 @@ export function DraftRoom() {
           </div>
 
           {/* Right: Pick History */}
-          <div className="bg-gray-800 rounded p-4 overflow-y-auto max-h-[calc(100vh-300px)]">
+          <div className="bg-surface rounded p-4 overflow-y-auto max-h-[calc(100vh-300px)]">
             <DraftResults />
           </div>
         </div>

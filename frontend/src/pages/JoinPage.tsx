@@ -25,10 +25,10 @@ export function JoinPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white">
+    <div className="min-h-screen flex items-center justify-center bg-surface-base text-white">
       <form
         onSubmit={(e) => { e.preventDefault(); handleJoin(); }}
-        className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-md w-full"
+        className="bg-surface p-8 rounded-lg shadow-lg max-w-md w-full"
       >
         <h1 className="text-2xl font-bold mb-6 text-center">Join Draft</h1>
 
@@ -39,7 +39,7 @@ export function JoinPage() {
             value={teamName}
             onChange={(e) => setTeamName(e.target.value)}
             placeholder="Enter Team Name"
-            className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            className="w-full px-4 py-3 bg-surface-input border border-edge-input rounded-lg text-white placeholder-content-tertiary focus:outline-none focus:border-accent-focus focus:ring-1 focus:ring-accent-focus"
           />
         </div>
 
@@ -50,7 +50,7 @@ export function JoinPage() {
             value={passKey}
             onChange={(e) => setPassKey(e.target.value)}
             placeholder="Enter Passkey"
-            className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+            className="w-full px-4 py-3 bg-surface-input border border-edge-input rounded-lg text-white placeholder-content-tertiary focus:outline-none focus:border-accent-focus focus:ring-1 focus:ring-accent-focus"
           />
         </div>
 
@@ -63,7 +63,7 @@ export function JoinPage() {
         <button
           type="submit"
           disabled={!(teamName && passKey)}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded transition-colors"
+          className="w-full bg-accent hover:bg-accent-hover disabled:bg-surface-hover disabled:text-content-tertiary disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded transition-colors"
         >
           Join
         </button>
