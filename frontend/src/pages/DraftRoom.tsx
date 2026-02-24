@@ -215,16 +215,6 @@ export function DraftRoom() {
             <DraftResults />
           </div>
         </div>
-
-        {/* Debug: Raw State */}
-        <details className="mt-4">
-          <summary className="text-gray-400 text-sm cursor-pointer">
-            Debug: Raw Store State
-          </summary>
-          <pre className="mt-2 p-4 bg-gray-800 rounded text-xs overflow-x-auto">
-            {JSON.stringify(useDraftStore.getState(), null, 2)}
-          </pre>
-        </details>
       </div>
     </div>
   );
