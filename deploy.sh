@@ -3,9 +3,9 @@ set -e
 
 # ---- Configuration ----
 # Update these values after setting up your EC2 instance
-SERVER_IP="your-elastic-ip"
+SERVER_IP="3.17.232.50"
 SERVER_USER="ec2-user"
-KEY="~/.ssh/your-key.pem"
+KEY="~/.ssh/fantasy-draft-key.pem"
 REMOTE_DIR="/opt/fantasy-draft"
 
 echo "=== Building Go backend ==="
