@@ -195,11 +195,15 @@ This approach works because:
 - [x] Draft complete banner
 - [x] `autopick()` admin command for skipping inactive users
 - [x] DB management shell script (`scripts/db.sh`: seed, draft-reset, migrate, fresh)
+- [x] Per-event SQL seed files for spinning up new event instances (`seed_players_championship_2026.sql`)
+- [x] `db.sh new-event` command to create events directly from CLI (no app visit needed)
+- [x] Updated `seed_all.sql` to be players-only (142 players, no event creation)
+- [x] Operational runbook (`scripts/RUNBOOK.md`) for prod event management
 - [x] Visual indicator for auto-drafted picks (DraftResults + TeamRoster show "(auto)" label)
 - [x] Auto-draft flag persisted to database (`is_auto_draft` column, migration 000006)
 - [x] Console `autopick()` command correctly flags picks as auto-drafted
 - [x] Handle reconnection gracefully (auto-reconnect with exponential backoff, reconnection banner UI)
-- [ ] Light/dark mode support
+- [x] Light/dark mode support
 - [ ] Mobile-responsive design
 
 ### Phase 4: Polish & Deploy (Week 4)
@@ -301,11 +305,17 @@ This approach works because:
 
 ### Database Management
 - Shell script (`backend/scripts/db.sh`) for all DB operations:
-  - `seed` — full clean slate: truncate all tables, insert players + event
+  - `seed` — full clean slate: truncate all tables, insert global players table (142 players)
+  - `new-event <seed-file>` — create a new event instance from a per-event SQL seed file
   - `draft-reset` — clear draft results and reset event status, keep users/players
+  - `clear-users` — delete all users and draft results, reset event status
   - `migrate-up` / `migrate-down` — run or rollback migrations
   - `fresh` — drop all tables and re-run migrations from scratch
-- Seed data for quick local development (111 Players Championship 2026 golfers)
+- **Event management workflow:**
+  1. `seed_all.sql` populates the global `players` table (~300 players across all events)
+  2. Per-event seed files (e.g., `seed_players_championship_2026.sql`) create an event record and link ~100-150 players from the global table
+  3. Run `db.sh new-event <file>` against prod via `DATABASE_URL` env var — event is live instantly
+  4. See `scripts/RUNBOOK.md` for full operational instructions
 - Migrations tracked in version control
 
 ### Timeline Flexibility
@@ -323,4 +333,4 @@ This approach works because:
 
 ---
 
-**Last Updated:** February 20, 2026 (Graceful WebSocket reconnection with exponential backoff)
+**Last Updated:** February 24, 2026 (Event management scripts, per-event seed files, operational runbook)
