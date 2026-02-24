@@ -192,7 +192,7 @@ export function DraftRoom() {
         {/* Mobile: single panel based on active tab */}
         <div className="md:hidden">
           {activeTab === 'team' && (
-            <div className="bg-surface rounded p-4 overflow-y-auto max-h-[calc(100vh-280px)]">
+            <div className="bg-surface rounded p-4 overflow-y-auto max-h-[70vh]">
               <select
                 value={viewTeamID ?? ''}
                 onChange={(e) => setViewTeamID(e.target.value ? Number(e.target.value) : null)}
@@ -209,12 +209,12 @@ export function DraftRoom() {
             </div>
           )}
           {activeTab === 'players' && (
-            <div className="overflow-y-auto max-h-[calc(100vh-280px)]">
+            <div className="overflow-y-auto max-h-[70vh]">
               <PlayerList onPickPlayer={pickPlayer} />
             </div>
           )}
           {activeTab === 'picks' && (
-            <div className="bg-surface rounded p-4 overflow-y-auto max-h-[calc(100vh-280px)]">
+            <div className="bg-surface rounded p-4 overflow-y-auto max-h-[70vh]">
               <DraftResults />
             </div>
           )}
@@ -223,7 +223,7 @@ export function DraftRoom() {
         {/* Desktop: Three-panel layout */}
         <div className="hidden md:grid grid-cols-[280px_1fr_280px] gap-4">
           {/* Left: Team Roster */}
-          <div className="bg-surface rounded p-4 overflow-y-auto max-h-[calc(100vh-300px)]">
+          <div className="bg-surface rounded p-4 overflow-y-auto max-h-[70vh]">
             <select
               value={viewTeamID ?? ''}
               onChange={(e) => setViewTeamID(e.target.value ? Number(e.target.value) : null)}
@@ -240,12 +240,12 @@ export function DraftRoom() {
           </div>
 
           {/* Center: Available Golfers */}
-          <div className="overflow-y-auto max-h-[calc(100vh-300px)]">
+          <div className="overflow-y-auto max-h-[70vh]">
             <PlayerList onPickPlayer={pickPlayer} />
           </div>
 
           {/* Right: Pick History */}
-          <div className="bg-surface rounded p-4 overflow-y-auto max-h-[calc(100vh-300px)]">
+          <div className="bg-surface rounded p-4 overflow-y-auto max-h-[70vh]">
             <DraftResults />
           </div>
         </div>

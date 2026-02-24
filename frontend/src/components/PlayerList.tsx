@@ -160,7 +160,7 @@ export function PlayerList({ onPickPlayer }: PlayerListProps) {
   }
 
   return (
-    <div className="p-4 bg-surface rounded flex flex-col max-h-[60vh] md:max-h-[70vh] overflow-hidden">
+    <div className="p-4 bg-surface rounded flex flex-col max-h-[70vh] overflow-hidden">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-semibold">Players ({displayedPlayers.length})</h2>
         <select
