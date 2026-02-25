@@ -25,6 +25,10 @@ echo "=== Uploading to server ==="
 scp -i "$KEY" server "${SERVER_USER}@${SERVER_IP}:${REMOTE_DIR}/server"
 rsync -avz -e "ssh -i $KEY" frontend/dist/ "${SERVER_USER}@${SERVER_IP}:${REMOTE_DIR}/static/"
 rsync -avz -e "ssh -i $KEY" backend/migrations/ "${SERVER_USER}@${SERVER_IP}:${REMOTE_DIR}/migrations/"
+rsync -avz -e "ssh -i $KEY" backend/scripts/ "${SERVER_USER}@${SERVER_IP}:${REMOTE_DIR}/scripts/"
+
+echo "=== Running migrations ==="
+ssh -i "$KEY" "${SERVER_USER}@${SERVER_IP}" "source <(grep 'DATABASE_URL' /etc/systemd/system/fantasy-draft.service | sed 's/.*DATABASE_URL=/DATABASE_URL=/') && cd ${REMOTE_DIR} && migrate -path ./migrations -database \"\$DATABASE_URL\" up"
 
 echo "=== Restarting service ==="
 ssh -i "$KEY" "${SERVER_USER}@${SERVER_IP}" "sudo systemctl restart fantasy-draft"
