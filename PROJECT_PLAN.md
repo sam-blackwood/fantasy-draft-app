@@ -104,11 +104,6 @@ Real-time fantasy draft application built as Portfolio Project #1 to demonstrate
 ### Single Draft Model
 The application supports one active draft at a time. This simplifies the WebSocket architecture - all connected clients are participating in the same draft. Multiple concurrent drafts are explicitly out of scope for MVP.
 
-### Sport-Agnostic Data Model
-- Flexible JSONB metadata fields for sport-specific attributes
-- Generic "player" and "event" entities
-- Extensible to football, basketball, etc. beyond golf
-
 ### Draft Configuration Flexibility
 Each event/draft supports configurable rules to accommodate different draft styles:
 - **Pick Limits:** Max picks per team (e.g., 6 players required)
