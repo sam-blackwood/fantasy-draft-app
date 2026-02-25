@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { getEvent, getUsers } from '../api/client';
 import { DraftOrder } from '../components/DraftOrder';
-import { Lobby } from '../components/Lobby';
 import { DraftResults } from '../components/DraftResults';
 import { DraftTimer } from '../components/DraftTimer';
+import { Lobby } from '../components/Lobby';
 import { PlayerList } from '../components/PlayerList';
 import { TeamRoster } from '../components/TeamRoster';
+import { ThemeToggle } from '../components/ThemeToggle';
 import { useDraftAdmin } from '../hooks/useDraftAdmin';
 import { useWebSocket } from '../hooks/useWebSocket';
-import { ThemeToggle } from '../components/ThemeToggle';
 import { useDraftStore } from '../store/draftStore';
 import { useLocalStore } from '../store/localStore';
 import { usePlayerStore } from '../store/playerStore';
@@ -48,11 +48,14 @@ export function DraftRoom() {
     return () => disconnect();
   }, [connect, disconnect, setRegisteredUsers, eventID]);
 
-  // Fetch event name
+  // Fetch event name and set tab title
   useEffect(() => {
     if (eventID != null) {
       getEvent(eventID)
-        .then((event) => setEventName(event.name))
+        .then((event) => {
+          setEventName(event.name);
+          document.title = `${event.name} Draft`;
+        })
         .catch((err) => console.error('Failed to fetch event:', err));
     }
   }, [eventID]);
@@ -178,11 +181,10 @@ export function DraftRoom() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-2 text-sm font-medium transition-colors ${
-                activeTab === tab
-                  ? 'bg-surface-input text-accent-bright border-b-2 border-accent-bright'
-                  : 'text-content-tertiary hover:text-content-secondary'
-              }`}
+              className={`flex-1 py-2 text-sm font-medium transition-colors ${activeTab === tab
+                ? 'bg-surface-input text-accent-bright border-b-2 border-accent-bright'
+                : 'text-content-tertiary hover:text-content-secondary'
+                }`}
             >
               {label}
             </button>

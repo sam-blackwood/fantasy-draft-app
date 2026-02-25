@@ -15,21 +15,19 @@ export function HomePage() {
         <div className="flex gap-1">
           <button
             onClick={() => setActiveTab('home')}
-            className={`px-4 py-2 rounded font-medium transition-colors cursor-pointer ${
-              activeTab === 'home'
-                ? 'bg-surface text-accent-bright'
-                : 'text-content-tertiary hover:text-content-secondary'
-            }`}
+            className={`px-4 py-2 rounded font-medium transition-colors cursor-pointer ${activeTab === 'home'
+              ? 'bg-surface text-accent-bright'
+              : 'text-content-tertiary hover:text-content-secondary'
+              }`}
           >
             Home
           </button>
           <button
             onClick={() => setActiveTab('join')}
-            className={`px-4 py-2 rounded font-medium transition-colors cursor-pointer ${
-              activeTab === 'join'
-                ? 'bg-surface text-accent-bright'
-                : 'text-content-tertiary hover:text-content-secondary'
-            }`}
+            className={`px-4 py-2 rounded font-medium transition-colors cursor-pointer ${activeTab === 'join'
+              ? 'bg-surface text-accent-bright'
+              : 'text-content-tertiary hover:text-content-secondary'
+              }`}
           >
             Join Draft
           </button>
