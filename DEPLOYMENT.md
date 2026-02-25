@@ -8,7 +8,7 @@ For any frontend or backend code changes, just run from the project root:
 ./deploy.sh
 ```
 
-This builds the Go binary + React frontend locally, uploads them to EC2, and restarts the app. That's it.
+This builds the Go binary + React frontend locally, uploads everything to EC2 (including migrations, scripts, and seed files), runs pending database migrations automatically, and restarts the service.
 
 ## Infrastructure Overview
 
@@ -86,10 +86,32 @@ DATABASE_URL="postgres://fantasyadmin:PASSWORD@localhost:5433/fantasy_draft_prod
 
 ## Running Database Migrations
 
-After adding new migration files in `backend/migrations/`:
+Migrations run automatically during `deploy.sh`. To run them manually on EC2:
 
-1. `deploy.sh` already uploads migrations to `/opt/fantasy-draft/migrations/` on the server
-2. Use the DB tunnel above to run them, or SSH in and run them directly
+```bash
+cd /opt/fantasy-draft
+migrate -path ./migrations -database "postgres://user:pass@your-rds:5432/fantasy_draft_prod" up
+```
+
+Get the full DATABASE_URL from the systemd service file:
+
+```bash
+sudo cat /etc/systemd/system/fantasy-draft.service
+```
+
+## Installed Tools on EC2
+
+- `migrate` — golang-migrate CLI at `/usr/local/bin/migrate` (for running migrations)
+- `psql` — PostgreSQL client (for ad-hoc SQL queries)
+
+## Server Layout
+
+All app files live at `/opt/fantasy-draft/` on EC2:
+
+- `server` — compiled Go binary
+- `static/` — React build output
+- `migrations/` — SQL migration files
+- `scripts/` — `db.sh`, seed files, RUNBOOK
 
 ## Troubleshooting
 
