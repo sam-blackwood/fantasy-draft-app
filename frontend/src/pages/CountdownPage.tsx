@@ -21,6 +21,8 @@ function calculateTimeRemaining(eventDate: string): TimeRemaining | null {
   };
 }
 
+const TITLE_TEXT = 'clubhousedraft.com';
+
 export function CountdownPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,7 +65,7 @@ export function CountdownPage() {
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-3xl md:text-5xl font-bold mb-4 text-highlight-text">
-            Fantasy Draft
+            {TITLE_TEXT}
           </h1>
           <p className="text-content-secondary text-lg">
             Next event TBD
@@ -95,7 +97,7 @@ export function CountdownPage() {
   return (
     <div className="flex-1 w-full flex flex-col items-center justify-center px-6">
       <h1 className="text-2xl md:text-4xl font-bold text-accent-bright mb-8 md:mb-12">
-        clubhousedraft.com
+        {TITLE_TEXT}
       </h1>
       <p className="text-content-tertiary text-sm mb-4 uppercase tracking-wider">
         Next event starts in
