@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ThemeToggle } from '../components/ThemeToggle';
 import { CountdownPage } from './CountdownPage';
 import { JoinPage } from './JoinPage';
@@ -7,6 +7,10 @@ type Tab = 'home' | 'join';
 
 export function HomePage() {
   const [activeTab, setActiveTab] = useState<Tab>('home');
+
+  useEffect(() => {
+    document.title = 'Clubhouse Draft';
+  }, []);
 
   return (
     <div className="h-dvh flex flex-col overflow-hidden bg-surface-base text-content-primary">
