@@ -121,7 +121,28 @@ WHERE (p.first_name, p.last_name) IN (
     ('Brian', 'Campbell'),
     ('Adam', 'Schenk'),
     ('Cameron', 'Davis'),
-    ('Joe', 'Highsmith')
+    ('Joe', 'Highsmith'),
+    ('Max', 'Homa'),
+    ('Kristoffer', 'Reitan'),
+    ('Alex', 'Noren'),
+    ('Ricky', 'Castillo'),
+    ('Jordan', 'Smith'),
+    ('Haotong', 'Li'),
+    ('Zecheng', 'Dou'),
+    ('Seamus', 'Power'),
+    ('Patton', 'Kizzire'),
+    ('Andrew', 'Putnam'),
+    ('Joel', 'Dahmen'),
+    ('Taylor', 'Moore'),
+    ('Pierceson', 'Coody'),
+    ('Adam', 'Scott'),
+    ('Sahith', 'Theegala'),
+    ('Austin', 'Smotherman'),
+    ('S.H.', 'Kim'),
+    ('Matthieu', 'Pavon'),
+    ('Zach', 'Bauchou'),
+    ('Sudarshan', 'Yellamaraju'),
+    ('A.J.', 'Ewart')
 );
 
 COMMIT;

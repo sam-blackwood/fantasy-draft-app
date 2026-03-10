@@ -8,7 +8,7 @@ BEGIN;
 -- Nuke everything (order matters for foreign keys, CASCADE handles the rest)
 TRUNCATE TABLE draft_results, event_players, users, players, events RESTART IDENTITY CASCADE;
 
--- Insert all players (142 total: 102 in 2026 Players Championship field + 40 others)
+-- Insert all players (153 total: 123 in 2026 Players Championship field + 30 others)
 INSERT INTO players (first_name, last_name, status, country_code) VALUES
     ('Scottie', 'Scheffler', 'professional', 'USA'),
     ('Tommy', 'Fleetwood', 'professional', 'ENG'),
@@ -151,7 +151,18 @@ INSERT INTO players (first_name, last_name, status, country_code) VALUES
     ('Danny', 'Walker', 'professional', 'USA'),
     ('Brian', 'Campbell', 'professional', 'USA'),
     ('Adam', 'Schenk', 'professional', 'USA'),
-    ('Joe', 'Highsmith', 'professional', 'USA');
+    ('Joe', 'Highsmith', 'professional', 'USA'),
+    ('Kristoffer', 'Reitan', 'professional', 'NOR'),
+    ('Ricky', 'Castillo', 'professional', 'USA'),
+    ('Jordan', 'Smith', 'professional', 'ENG'),
+    ('Haotong', 'Li', 'professional', 'CHN'),
+    ('Zecheng', 'Dou', 'professional', 'CHN'),
+    ('Seamus', 'Power', 'professional', 'IRL'),
+    ('Pierceson', 'Coody', 'professional', 'USA'),
+    ('Austin', 'Smotherman', 'professional', 'USA'),
+    ('Zach', 'Bauchou', 'professional', 'USA'),
+    ('Sudarshan', 'Yellamaraju', 'professional', 'CAN'),
+    ('A.J.', 'Ewart', 'professional', 'CAN');
 
 COMMIT;
 
