@@ -8,7 +8,7 @@ BEGIN;
 -- Nuke everything (order matters for foreign keys, CASCADE handles the rest)
 TRUNCATE TABLE draft_results, event_players, users, players, events RESTART IDENTITY CASCADE;
 
--- Insert all players (153 total: 123 in 2026 Players Championship field + 30 others)
+-- Insert all players (179 total: 123 in 2026 Players Championship field + 30 others + 26 Masters-only)
 INSERT INTO players (first_name, last_name, status, country_code) VALUES
     ('Scottie', 'Scheffler', 'professional', 'USA'),
     ('Tommy', 'Fleetwood', 'professional', 'ENG'),
@@ -162,7 +162,34 @@ INSERT INTO players (first_name, last_name, status, country_code) VALUES
     ('Austin', 'Smotherman', 'professional', 'USA'),
     ('Zach', 'Bauchou', 'professional', 'USA'),
     ('Sudarshan', 'Yellamaraju', 'professional', 'CAN'),
-    ('A.J.', 'Ewart', 'professional', 'CAN');
+    ('A.J.', 'Ewart', 'professional', 'CAN'),
+    -- Masters 2026 additions
+    ('Angel', 'Cabrera', 'professional', 'ARG'),
+    ('Fred', 'Couples', 'professional', 'USA'),
+    ('Bryson', 'DeChambeau', 'professional', 'USA'),
+    ('Ethan', 'Fang', 'amateur', 'USA'),
+    ('Sergio', 'Garcia', 'professional', 'ESP'),
+    ('Jackson', 'Herrington', 'amateur', 'USA'),
+    ('Brandon', 'Holtz', 'amateur', 'USA'),
+    ('Mason', 'Howell', 'amateur', 'USA'),
+    ('Casey', 'Jarvis', 'professional', 'RSA'),
+    ('Dustin', 'Johnson', 'professional', 'USA'),
+    ('Zach', 'Johnson', 'professional', 'USA'),
+    ('Naoyuki', 'Kataoka', 'professional', 'JPN'),
+    ('Fifa', 'Laopakdee', 'amateur', 'THA'),
+    ('Tom', 'McKibbin', 'professional', 'NIR'),
+    ('Rasmus', 'Neergaard-Petersen', 'professional', 'DNK'),
+    ('Jose Maria', 'Olazabal', 'professional', 'ESP'),
+    ('Carlos', 'Ortiz', 'professional', 'MEX'),
+    ('Mateo', 'Pulcini', 'amateur', 'ARG'),
+    ('Jon', 'Rahm', 'professional', 'ESP'),
+    ('Patrick', 'Reed', 'professional', 'USA'),
+    ('Charl', 'Schwartzel', 'professional', 'RSA'),
+    ('Vijay', 'Singh', 'professional', 'FIJ'),
+    ('Cameron', 'Smith', 'professional', 'AUS'),
+    ('Bubba', 'Watson', 'professional', 'USA'),
+    ('Mike', 'Weir', 'professional', 'CAN'),
+    ('Danny', 'Willett', 'professional', 'ENG');
 
 COMMIT;
 
