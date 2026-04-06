@@ -5,6 +5,22 @@ import { useLocalStore } from '../store/localStore';
 import { usePlayerStore } from '../store/playerStore';
 import type { ClientMessage } from '../types';
 
+/**
+ * Picks a random available player for the current turn user.
+ * Returns the message to send, or null if autopick isn't possible.
+ */
+export function buildAutopickMessage(): { message: ClientMessage; playerID: number; userID: number } | null {
+  const { currentTurn, availablePlayerIDs, draftStatus } = useDraftStore.getState();
+  if (draftStatus !== 'in_progress') return null;
+  if (currentTurn == null || !availablePlayerIDs?.length) return null;
+  const playerID = availablePlayerIDs[Math.floor(Math.random() * availablePlayerIDs.length)];
+  return {
+    message: { type: 'make_pick', userID: currentTurn, playerID, autoDraft: true },
+    playerID,
+    userID: currentTurn,
+  };
+}
+
 interface DraftAdmin {
   startDraft: (pickOrder: number[], totalRounds: number, timerDuration: number) => void;
   pause: () => void;
@@ -85,18 +101,13 @@ export function useDraftAdmin(sendMessage: (message: ClientMessage) => void) {
         sendMessage({ type: 'make_pick', userID, playerID });
       },
       autopick: () => {
-        const { currentTurn, availablePlayerIDs, draftStatus } = useDraftStore.getState();
-        if (draftStatus !== 'in_progress') {
-          console.warn('Draft is not in progress');
+        const result = buildAutopickMessage();
+        if (!result) {
+          console.warn('Cannot autopick: draft not in progress or no available players');
           return;
         }
-        if (currentTurn == null || !availablePlayerIDs?.length) {
-          console.warn('No current turn or no available players');
-          return;
-        }
-        const playerID = availablePlayerIDs[Math.floor(Math.random() * availablePlayerIDs.length)];
-        console.log(`Autopicking player ${playerID} for user ${currentTurn}`);
-        sendMessage({ type: 'make_pick', userID: currentTurn, playerID, autoDraft: true });
+        console.log(`Autopicking player ${result.playerID} for user ${result.userID}`);
+        sendMessage(result.message);
       },
       status: () => {
         const state = useDraftStore.getState();

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { getEvent, getUsers } from '../api/client';
+import { AdminPanel } from '../components/AdminPanel';
 import { DraftOrder } from '../components/DraftOrder';
 import { DraftResults } from '../components/DraftResults';
 import { DraftTimer } from '../components/DraftTimer';
@@ -83,6 +84,9 @@ export function DraftRoom() {
       return () => clearTimeout(timer);
     }
   }, [connectionStatus, reconnectAttempt]);
+
+  // Admin mode via URL param
+  const isAdmin = new URLSearchParams(window.location.search).get('admin') === 'true';
 
   // Computed values
   const isPreDraft = draftStatus === 'idle';
@@ -252,6 +256,7 @@ export function DraftRoom() {
           </div>
         </div>
       </div>
+      {isAdmin && <AdminPanel sendMessage={sendMessage} />}
     </div>
   );
 }
