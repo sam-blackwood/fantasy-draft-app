@@ -11,7 +11,7 @@ interface PlayerListProps {
 export function PlayerList({ onPickPlayer }: PlayerListProps) {
   // State properties
   const [searchFilter, setSearchFilter] = useState<string>('');
-  const [sortConfig, setSortConfig] = useState<PlayerSort | null>(null);
+  const [sortConfig, setSortConfig] = useState<PlayerSort | null>({ sortField: 'name', sortDirection: 'asc' });
   const [countryCodeFilter, setCountryCodeFilter] = useState<string[] | null>(null);
   const [countryDropdownOpen, setCountryDropdownOpen] = useState(false);
   const [playerFilter, setPlayerFilter] = useState<'available' | 'drafted' | 'all'>('available');
