@@ -1,0 +1,258 @@
+-- Seed: The PGA Championship 2026
+-- Creates a new event instance and links the field from the global players table.
+-- Also adds 49 new players to the global table idempotently (PGA Section club pros
+-- + tour pros not in prior fields), so this file is safe to run standalone on prod.
+-- Usage: ./scripts/db.sh new-event seed_pga_championship_2026.sql <passkey>
+
+BEGIN;
+
+-- Ensure all PGA Championship 2026 players exist in the global players table.
+-- Idempotent via WHERE NOT EXISTS (no unique constraint on first_name/last_name).
+INSERT INTO players (first_name, last_name, status, country_code)
+SELECT v.first_name, v.last_name, v.status, v.country_code
+FROM (VALUES
+    ('David', 'Puig', 'professional', 'ESP'),
+    ('Jayden', 'Schaper', 'professional', 'RSA'),
+    ('Alex', 'Fitzpatrick', 'professional', 'ENG'),
+    ('John', 'Parry', 'professional', 'ENG'),
+    ('David', 'Lipsky', 'professional', 'USA'),
+    ('Elvis', 'Smylie', 'professional', 'AUS'),
+    ('Daniel', 'Hillier', 'professional', 'NZL'),
+    ('Adrien', 'Saddier', 'professional', 'FRA'),
+    ('Daniel', 'Brown', 'professional', 'ENG'),
+    ('Andy', 'Sullivan', 'professional', 'ENG'),
+    ('Angel', 'Ayora', 'professional', 'ESP'),
+    ('Chandler', 'Blanchet', 'professional', 'USA'),
+    ('Ian', 'Holt', 'professional', 'USA'),
+    ('Brandt', 'Snedeker', 'professional', 'USA'),
+    ('Mikael', 'Lindberg', 'professional', 'SWE'),
+    ('Travis', 'Smyth', 'professional', 'AUS'),
+    ('Kazuki', 'Higa', 'professional', 'JPN'),
+    ('Joaquin', 'Niemann', 'professional', 'CHI'),
+    ('Kota', 'Kaneko', 'professional', 'JPN'),
+    ('Bernd', 'Wiesberger', 'professional', 'AUT'),
+    ('Jordan', 'Gumberg', 'professional', 'USA'),
+    ('Padraig', 'Harrington', 'professional', 'IRL'),
+    ('Derek', 'Berg', 'professional', 'USA'),
+    ('Francisco', 'Bide', 'professional', 'ARG'),
+    ('Michael', 'Block', 'professional', 'USA'),
+    ('Stewart', 'Cink', 'professional', 'USA'),
+    ('Tyler', 'Collet', 'professional', 'USA'),
+    ('Luke', 'Donald', 'professional', 'ENG'),
+    ('Jesse', 'Droemer', 'professional', 'USA'),
+    ('Jason', 'Dufner', 'professional', 'USA'),
+    ('Bryce', 'Fisher', 'professional', 'USA'),
+    ('Chris', 'Gabriele', 'professional', 'USA'),
+    ('Mark', 'Geddes', 'professional', 'ENG'),
+    ('Zach', 'Haynes', 'professional', 'USA'),
+    ('Austin', 'Hurt', 'professional', 'USA'),
+    ('Jared', 'Jones', 'professional', 'USA'),
+    ('Michael', 'Kartrude', 'professional', 'USA'),
+    ('Martin', 'Kaymer', 'professional', 'GER'),
+    ('Ben', 'Kern', 'professional', 'USA'),
+    ('Ryan', 'Lenahan', 'professional', 'USA'),
+    ('Paul', 'McClure', 'professional', 'USA'),
+    ('Shaun', 'Micheel', 'professional', 'USA'),
+    ('Ben', 'Polland', 'professional', 'USA'),
+    ('Garrett', 'Sapp', 'professional', 'USA'),
+    ('Braden', 'Shattuck', 'professional', 'USA'),
+    ('Ryan', 'Vermeer', 'professional', 'USA'),
+    ('Jimmy', 'Walker', 'professional', 'USA'),
+    ('Timothy', 'Wiseman', 'professional', 'USA'),
+    ('Y.E.', 'Yang', 'professional', 'KOR')
+) AS v(first_name, last_name, status, country_code)
+WHERE NOT EXISTS (
+    SELECT 1 FROM players p
+    WHERE p.first_name = v.first_name AND p.last_name = v.last_name
+);
+
+-- Create the event
+INSERT INTO events (name, max_picks_per_team, max_teams_per_player, status, passkey, event_date, stipulations)
+VALUES ('The PGA Championship 2026', 6, 1, 'not_started', :passkey, '2026-05-14 00:00:00-04'::timestamptz, '{"tournament": "PGA Championship", "year": 2026}'::jsonb)
+RETURNING id AS new_event_id;
+
+-- Link players to the event by name
+-- Uses a CTE to capture the new event ID
+WITH new_event AS (
+    SELECT id FROM events
+    WHERE name = 'The PGA Championship 2026'
+    ORDER BY id DESC LIMIT 1
+)
+INSERT INTO event_players (event_id, player_id)
+SELECT new_event.id, p.id
+FROM new_event, players p
+WHERE (p.first_name, p.last_name) IN (
+    ('Scottie', 'Scheffler'),
+    ('Rory', 'McIlroy'),
+    ('Cameron', 'Young'),
+    ('Matt', 'Fitzpatrick'),
+    ('Collin', 'Morikawa'),
+    ('Tommy', 'Fleetwood'),
+    ('Justin', 'Rose'),
+    ('J.J.', 'Spaun'),
+    ('Russell', 'Henley'),
+    ('Chris', 'Gotterup'),
+    ('Xander', 'Schauffele'),
+    ('Robert', 'MacIntyre'),
+    ('Sepp', 'Straka'),
+    ('Ben', 'Griffin'),
+    ('Ludvig', 'Aberg'),
+    ('Justin', 'Thomas'),
+    ('Hideki', 'Matsuyama'),
+    ('Alex', 'Noren'),
+    ('Jacob', 'Bridgeman'),
+    ('Jon', 'Rahm'),
+    ('Harris', 'English'),
+    ('Si Woo', 'Kim'),
+    ('Akshay', 'Bhatia'),
+    ('Patrick', 'Reed'),
+    ('Kristoffer', 'Reitan'),
+    ('Tyrrell', 'Hatton'),
+    ('Viktor', 'Hovland'),
+    ('Bryson', 'DeChambeau'),
+    ('Nicolai', 'Hojgaard'),
+    ('Patrick', 'Cantlay'),
+    ('Min Woo', 'Lee'),
+    ('Keegan', 'Bradley'),
+    ('Maverick', 'McNealy'),
+    ('Kurt', 'Kitayama'),
+    ('Sam', 'Burns'),
+    ('Ryan', 'Gerard'),
+    ('Rickie', 'Fowler'),
+    ('Shane', 'Lowry'),
+    ('Marco', 'Penge'),
+    ('Jason', 'Day'),
+    ('Daniel', 'Berger'),
+    ('Matt', 'McCarty'),
+    ('Aaron', 'Rai'),
+    ('Michael', 'Kim'),
+    ('Adam', 'Scott'),
+    ('Gary', 'Woodland'),
+    ('Nico', 'Echavarria'),
+    ('Sam', 'Stevens'),
+    ('Corey', 'Conners'),
+    ('Jordan', 'Spieth'),
+    ('Michael', 'Brennan'),
+    ('Brian', 'Harman'),
+    ('Andrew', 'Novak'),
+    ('Pierceson', 'Coody'),
+    ('Ryan', 'Fox'),
+    ('Harry', 'Hall'),
+    ('Nick', 'Taylor'),
+    ('Ryo', 'Hisatsune'),
+    ('Sami', 'Valimaki'),
+    ('Thomas', 'Detry'),
+    ('David', 'Puig'),
+    ('Michael', 'Thorbjornsen'),
+    ('Rasmus', 'Hojgaard'),
+    ('Jayden', 'Schaper'),
+    ('Bud', 'Cauley'),
+    ('Sungjae', 'Im'),
+    ('Jordan', 'Smith'),
+    ('Matt', 'Wallace'),
+    ('Max', 'Greyserman'),
+    ('Wyndham', 'Clark'),
+    ('Casey', 'Jarvis'),
+    ('Patrick', 'Rodgers'),
+    ('Johnny', 'Keefer'),
+    ('Aldrich', 'Potgieter'),
+    ('Sahith', 'Theegala'),
+    ('Rasmus', 'Neergaard-Petersen'),
+    ('Alex', 'Smalley'),
+    ('J.T.', 'Poston'),
+    ('Haotong', 'Li'),
+    ('Max', 'McGreevy'),
+    ('Andrew', 'Putnam'),
+    ('Alex', 'Fitzpatrick'),
+    ('Austin', 'Smotherman'),
+    ('Garrick', 'Higgo'),
+    ('Taylor', 'Pendrith'),
+    ('John', 'Parry'),
+    ('Rico', 'Hoey'),
+    ('Ricky', 'Castillo'),
+    ('David', 'Lipsky'),
+    ('Christiaan', 'Bezuidenhout'),
+    ('Lucas', 'Glover'),
+    ('Elvis', 'Smylie'),
+    ('Daniel', 'Hillier'),
+    ('Matti', 'Schmid'),
+    ('Chris', 'Kirk'),
+    ('Denny', 'McCarthy'),
+    ('Stephan', 'Jaeger'),
+    ('Adrien', 'Saddier'),
+    ('Daniel', 'Brown'),
+    ('Mac', 'Meissner'),
+    ('Brian', 'Campbell'),
+    ('Sudarshan', 'Yellamaraju'),
+    ('Andy', 'Sullivan'),
+    ('Angel', 'Ayora'),
+    ('Tom', 'McKibbin'),
+    ('Keith', 'Mitchell'),
+    ('Kevin', 'Yu'),
+    ('Chandler', 'Blanchet'),
+    ('Ian', 'Holt'),
+    ('Emiliano', 'Grillo'),
+    ('Billy', 'Horschel'),
+    ('Tony', 'Finau'),
+    ('Kevin', 'Roy'),
+    ('Max', 'Homa'),
+    ('Tom', 'Hoge'),
+    ('Brooks', 'Koepka'),
+    ('Jhonattan', 'Vegas'),
+    ('Davis', 'Thompson'),
+    ('Brandt', 'Snedeker'),
+    ('William', 'Mouw'),
+    ('Steven', 'Fisk'),
+    ('Mikael', 'Lindberg'),
+    ('Davis', 'Riley'),
+    ('Travis', 'Smyth'),
+    ('Joe', 'Highsmith'),
+    ('Kazuki', 'Higa'),
+    ('Adam', 'Schenk'),
+    ('Joaquin', 'Niemann'),
+    ('Kota', 'Kaneko'),
+    ('Bernd', 'Wiesberger'),
+    ('Cameron', 'Smith'),
+    ('Jordan', 'Gumberg'),
+    ('Dustin', 'Johnson'),
+    ('Padraig', 'Harrington'),
+    ('Derek', 'Berg'),
+    ('Francisco', 'Bide'),
+    ('Michael', 'Block'),
+    ('Stewart', 'Cink'),
+    ('Tyler', 'Collet'),
+    ('Luke', 'Donald'),
+    ('Jesse', 'Droemer'),
+    ('Jason', 'Dufner'),
+    ('Bryce', 'Fisher'),
+    ('Chris', 'Gabriele'),
+    ('Mark', 'Geddes'),
+    ('Zach', 'Haynes'),
+    ('Austin', 'Hurt'),
+    ('Jared', 'Jones'),
+    ('Michael', 'Kartrude'),
+    ('Martin', 'Kaymer'),
+    ('Ben', 'Kern'),
+    ('Ryan', 'Lenahan'),
+    ('Paul', 'McClure'),
+    ('Shaun', 'Micheel'),
+    ('Ben', 'Polland'),
+    ('Garrett', 'Sapp'),
+    ('Braden', 'Shattuck'),
+    ('Ryan', 'Vermeer'),
+    ('Jimmy', 'Walker'),
+    ('Timothy', 'Wiseman'),
+    ('Y.E.', 'Yang')
+);
+
+COMMIT;
+
+-- Summary
+\echo ''
+\echo '=== New Event Created ==='
+SELECT id, name, passkey, max_picks_per_team, status
+FROM events ORDER BY id DESC LIMIT 1;
+
+SELECT COUNT(*) AS players_linked
+FROM event_players
+WHERE event_id = (SELECT id FROM events ORDER BY id DESC LIMIT 1);

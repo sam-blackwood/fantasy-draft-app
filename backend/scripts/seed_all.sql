@@ -8,7 +8,7 @@ BEGIN;
 -- Nuke everything (order matters for foreign keys, CASCADE handles the rest)
 TRUNCATE TABLE draft_results, event_players, users, players, events RESTART IDENTITY CASCADE;
 
--- Insert all players (179 total: 123 in 2026 Players Championship field + 30 others + 26 Masters-only)
+-- Insert all players (228 total: 123 in 2026 Players Championship field + 30 others + 26 Masters-only + 49 PGA Championship additions)
 INSERT INTO players (first_name, last_name, status, country_code) VALUES
     ('Scottie', 'Scheffler', 'professional', 'USA'),
     ('Tommy', 'Fleetwood', 'professional', 'ENG'),
@@ -189,7 +189,57 @@ INSERT INTO players (first_name, last_name, status, country_code) VALUES
     ('Cameron', 'Smith', 'professional', 'AUS'),
     ('Bubba', 'Watson', 'professional', 'USA'),
     ('Mike', 'Weir', 'professional', 'CAN'),
-    ('Danny', 'Willett', 'professional', 'ENG');
+    ('Danny', 'Willett', 'professional', 'ENG'),
+    -- PGA Championship 2026 additions
+    ('David', 'Puig', 'professional', 'ESP'),
+    ('Jayden', 'Schaper', 'professional', 'RSA'),
+    ('Alex', 'Fitzpatrick', 'professional', 'ENG'),
+    ('John', 'Parry', 'professional', 'ENG'),
+    ('David', 'Lipsky', 'professional', 'USA'),
+    ('Elvis', 'Smylie', 'professional', 'AUS'),
+    ('Daniel', 'Hillier', 'professional', 'NZL'),
+    ('Adrien', 'Saddier', 'professional', 'FRA'),
+    ('Daniel', 'Brown', 'professional', 'ENG'),
+    ('Andy', 'Sullivan', 'professional', 'ENG'),
+    ('Angel', 'Ayora', 'professional', 'ESP'),
+    ('Chandler', 'Blanchet', 'professional', 'USA'),
+    ('Ian', 'Holt', 'professional', 'USA'),
+    ('Brandt', 'Snedeker', 'professional', 'USA'),
+    ('Mikael', 'Lindberg', 'professional', 'SWE'),
+    ('Travis', 'Smyth', 'professional', 'AUS'),
+    ('Kazuki', 'Higa', 'professional', 'JPN'),
+    ('Joaquin', 'Niemann', 'professional', 'CHI'),
+    ('Kota', 'Kaneko', 'professional', 'JPN'),
+    ('Bernd', 'Wiesberger', 'professional', 'AUT'),
+    ('Jordan', 'Gumberg', 'professional', 'USA'),
+    ('Padraig', 'Harrington', 'professional', 'IRL'),
+    ('Derek', 'Berg', 'professional', 'USA'),
+    ('Francisco', 'Bide', 'professional', 'ARG'),
+    ('Michael', 'Block', 'professional', 'USA'),
+    ('Stewart', 'Cink', 'professional', 'USA'),
+    ('Tyler', 'Collet', 'professional', 'USA'),
+    ('Luke', 'Donald', 'professional', 'ENG'),
+    ('Jesse', 'Droemer', 'professional', 'USA'),
+    ('Jason', 'Dufner', 'professional', 'USA'),
+    ('Bryce', 'Fisher', 'professional', 'USA'),
+    ('Chris', 'Gabriele', 'professional', 'USA'),
+    ('Mark', 'Geddes', 'professional', 'ENG'),
+    ('Zach', 'Haynes', 'professional', 'USA'),
+    ('Austin', 'Hurt', 'professional', 'USA'),
+    ('Jared', 'Jones', 'professional', 'USA'),
+    ('Michael', 'Kartrude', 'professional', 'USA'),
+    ('Martin', 'Kaymer', 'professional', 'GER'),
+    ('Ben', 'Kern', 'professional', 'USA'),
+    ('Ryan', 'Lenahan', 'professional', 'USA'),
+    ('Paul', 'McClure', 'professional', 'USA'),
+    ('Shaun', 'Micheel', 'professional', 'USA'),
+    ('Ben', 'Polland', 'professional', 'USA'),
+    ('Garrett', 'Sapp', 'professional', 'USA'),
+    ('Braden', 'Shattuck', 'professional', 'USA'),
+    ('Ryan', 'Vermeer', 'professional', 'USA'),
+    ('Jimmy', 'Walker', 'professional', 'USA'),
+    ('Timothy', 'Wiseman', 'professional', 'USA'),
+    ('Y.E.', 'Yang', 'professional', 'KOR');
 
 COMMIT;
 
