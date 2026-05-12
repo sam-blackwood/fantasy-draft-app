@@ -1,39 +1,44 @@
 ---
-name: create-event
-description: Use this agent to create a new fantasy draft event (tournament) end-to-end from a CSV field file. Handles generating the seed_<event>_<year>.sql file, updating seed_all.sql with any new players, deploying to prod, and running the new-event command. Trigger when the user says things like "create a new event", "add a new tournament", "upload the field for X", or provides a CSV of players + a passkey.
+description: Create a new fantasy draft event end-to-end from a CSV field file (generates seed SQL, updates seed_all.sql, deploys, runs new-event on prod, verifies counts).
+argument-hint: [csv-path] [passkey]
 ---
 
-You are a specialized agent for creating new fantasy draft events in this repo. Your job is to take a CSV file of the tournament field and produce a working event in prod, end-to-end.
+# Create a new fantasy draft event
 
-## Required inputs (ask the user if any are missing)
+Walk through this workflow end-to-end. Confirm with me before any prod-touching action.
 
-1. **CSV path** — file with columns `FirstName,LastName,CountryCode` (one row per player in the field)
+Arguments (optional, may be partial): `$ARGUMENTS`
+- If a CSV path was provided, start there.
+- If a passkey was provided, use it.
+- Anything not provided, ask me.
+
+## Required inputs (ask me if missing)
+
+1. **CSV path** — file with columns `FirstName,LastName,CountryCode` (one row per player)
 2. **Event name** — e.g. "The PGA Championship 2026" (must be unique; prefix with "The" to match existing convention)
-3. **Event date** — typically Thursday (first round) of the tournament, formatted `YYYY-MM-DD` with appropriate UTC offset (e.g. `-04` for ET/EDT, `-05` for ET/EST)
+3. **Event date** — typically Thursday (first round) of the tournament, formatted `YYYY-MM-DD` with appropriate UTC offset (`-04` for EDT, `-05` for EST)
 4. **Passkey** — short string friends will use to join the draft room
 5. **Stipulations JSON** — defaults to `{"tournament": "<short name>", "year": <year>}`; ask if anything special
 
-## Workflow
-
-### Step 1: Understand the field
+## Step 1: Understand the field
 
 Read the CSV. Note that:
 - The last line often lacks a trailing newline; `wc -l` undercounts. Use `grep -c ","` or count entries another way.
 - Country codes come straight from the CSV.
 - **Accent normalization is critical.** seed_all.sql uses ASCII-only spellings. Convert before matching:
   - `Åberg → Aberg`, `Højgaard → Hojgaard`, `Bidé → Bide`, etc.
-- **Status:** Default everyone to `'professional'`. If the user mentions amateurs or you see `(a)` markers, ask which ones.
+- **Status:** Default everyone to `'professional'`. If I mention amateurs or you see `(a)` markers, ask which ones.
 
-### Step 2: Cross-reference against the global players table
+## Step 2: Cross-reference against the global players table
 
 Read `backend/scripts/seed_all.sql` to get the canonical list of players. For each CSV row (after accent normalization), check if `(first_name, last_name)` exists in seed_all.sql.
 
-Report to the user:
+Report back:
 - Total field size (e.g. "161 players in the field")
 - How many are already in the global table vs. new
 - A spot-check of the new players (especially anyone surprising)
 
-### Step 3: Generate the event seed file
+## Step 3: Generate the event seed file
 
 Filename: `backend/scripts/seed_<event_slug>_<year>.sql` (e.g. `seed_pga_championship_2026.sql`).
 
@@ -94,16 +99,16 @@ WHERE event_id = (SELECT id FROM events ORDER BY id DESC LIMIT 1);
 
 Key rules:
 - If there are zero new players, **omit the entire INSERT INTO players block** — keep the seed file clean.
-- Defaults: `max_picks_per_team = 6`, `max_teams_per_player = 1`. Ask only if the user implies Ryder Cup style or different rules.
+- Defaults: `max_picks_per_team = 6`, `max_teams_per_player = 1`. Ask only if I imply Ryder Cup style or different rules.
 - The `:passkey` binding is filled in by `db.sh new-event` via `-v passkey="'$3'"`. Don't hardcode it.
 
-### Step 4: Update seed_all.sql
+## Step 4: Update seed_all.sql
 
 Append the new players under a comment header `-- <Event> additions` (matching the existing pattern). Update the top-of-file count comment to reflect the new total. **Don't reorder existing entries** — only append.
 
-### Step 5: Verify before deploying
+## Step 5: Verify before deploying
 
-Run these sanity checks and report to the user:
+Run these sanity checks and report back:
 - Count of entries in the IN clause = count of CSV rows (after dedupe)
 - No duplicate `(first_name, last_name)` in seed_all.sql
 - No duplicate entries in the IN clause
@@ -117,11 +122,11 @@ awk '/WHERE \(p.first_name, p.last_name\) IN/,/^\);/' backend/scripts/seed_<slug
 grep -oE "^    \('[^']*', '[^']*'" backend/scripts/seed_all.sql | sort | uniq -d
 ```
 
-### Step 6: Confirm before touching prod
+## Step 6: Confirm before touching prod
 
-**Always ask the user before running `./deploy.sh`**. It briefly restarts the live `fantasy-draft` service. Phrase it like: "Ready to deploy? This will restart the prod service briefly."
+**Always ask before running `./deploy.sh`**. It briefly restarts the live `fantasy-draft` service. Phrase it like: "Ready to deploy? This will restart the prod service briefly."
 
-### Step 7: Deploy + create event
+## Step 7: Deploy + create event
 
 ```bash
 ./deploy.sh
@@ -138,7 +143,7 @@ ssh -i ~/.ssh/fantasy-draft-key.pem ec2-user@3.17.232.50 \
 
 Capture the output. It should print the new event ID and `players_linked = <N>`.
 
-### Step 8: VERIFY the linked count matches the CSV count
+## Step 8: VERIFY the linked count matches the CSV count
 
 **This is the step that catches the most common bug.** `seed_all.sql` may be ahead of prod (it tracks intent, not actual prod state). If `players_linked < CSV count`, some IN-clause names don't match any row in prod's `players` table.
 
@@ -174,9 +179,9 @@ COMMIT;
 
 Re-query `players_linked` to confirm it now equals the CSV count.
 
-### Step 9: Final report
+## Step 9: Final report
 
-Tell the user:
+Tell me:
 - New event ID, name, passkey, event date
 - Total players linked (must equal CSV count)
 - Any players that needed the prod-recovery insert in Step 8
@@ -185,7 +190,7 @@ Tell the user:
 ## Style
 
 - Confirm before any prod-touching action (`./deploy.sh`, SSH writes). Reading is fine.
-- Be terse. The user is the developer running this — skip explanations of what the repo is.
+- Be terse. Skip explanations of what the repo is — I built it.
 - Use the `Read` tool for files, not `cat`.
 - When pasting long player lists into bash/SSH heredocs, watch for quoting issues — the existing seed files are the source of truth for formatting.
 
