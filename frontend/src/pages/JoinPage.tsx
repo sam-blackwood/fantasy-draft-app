@@ -12,10 +12,11 @@ export function JoinPage() {
   const [error, setError] = useState<string | null>(null);
 
   function handleJoin() {
-    if (!teamName || !passKey) return;
+    const trimmedTeamName = teamName.trim();
+    if (!trimmedTeamName || !passKey) return;
     // Clear out error before attempting to join draft
     setError(null);
-    joinDraft(teamName, passKey)
+    joinDraft(trimmedTeamName, passKey)
       .then((user) => {
         setEventID(user.eventID);
         setUserID(user.id);

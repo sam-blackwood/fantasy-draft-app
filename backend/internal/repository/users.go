@@ -132,7 +132,7 @@ func (r *UserRepository) GetByEventAndUsername(ctx context.Context, eventID int,
 	query := `
 		SELECT id, event_id, username, created_at
 		FROM users
-		WHERE event_id = $1 AND username = $2
+		WHERE event_id = $1 AND LOWER(username) = LOWER($2)
 	`
 
 	var user models.User

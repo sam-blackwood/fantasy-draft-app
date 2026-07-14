@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5"
@@ -108,6 +109,8 @@ func (h *DraftRoomHandler) JoinEvent(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error": "Invalid JSON"}`, http.StatusBadRequest)
 		return
 	}
+
+	req.TeamName = strings.TrimSpace(req.TeamName)
 
 	if req.TeamName == "" {
 		http.Error(w, `{"error": "Team Name is required"}`, http.StatusBadRequest)
