@@ -8,7 +8,7 @@ BEGIN;
 -- Nuke everything (order matters for foreign keys, CASCADE handles the rest)
 TRUNCATE TABLE draft_results, event_players, users, players, events RESTART IDENTITY CASCADE;
 
--- Insert all players (285 total: 123 in 2026 Players Championship field + 30 others + 26 Masters-only + 49 PGA Championship additions + 57 US Open additions)
+-- Insert all players (327 total: 123 in 2026 Players Championship field + 30 others + 26 Masters-only + 49 PGA Championship additions + 57 US Open additions + 42 Open Championship additions)
 INSERT INTO players (first_name, last_name, status, country_code) VALUES
     ('Scottie', 'Scheffler', 'professional', 'USA'),
     ('Tommy', 'Fleetwood', 'professional', 'ENG'),
@@ -297,7 +297,50 @@ INSERT INTO players (first_name, last_name, status, country_code) VALUES
     ('Jackson', 'Van Paris', 'professional', 'USA'),
     ('Brandon', 'Wu', 'professional', 'USA'),
     ('Dylan', 'Wu', 'professional', 'USA'),
-    ('Carl', 'Yuan', 'professional', 'CHN');
+    ('Carl', 'Yuan', 'professional', 'CHN'),
+    -- The Open Championship 2026 additions
+    ('Alejandro', 'De Castro Piera', 'amateur', 'ESP'),
+    ('Alistair', 'Docherty', 'professional', 'USA'),
+    ('Antoine', 'Rozner', 'professional', 'FRA'),
+    ('Austen', 'Truslow', 'professional', 'USA'),
+    ('Baard', 'Bjoernevik Skogen', 'professional', 'NOR'),
+    ('Cameron', 'John', 'professional', 'AUS'),
+    ('Dan', 'Bradbury', 'professional', 'ENG'),
+    ('Darren', 'Clarke', 'professional', 'NIR'),
+    ('David', 'Duval', 'professional', 'USA'),
+    ('David', 'Howard', 'amateur', 'IRL'),
+    ('Eugenio', 'Chacarra', 'professional', 'ESP'),
+    ('Francesco', 'Laporta', 'professional', 'ITA'),
+    ('Francesco', 'Molinari', 'professional', 'ITA'),
+    ('Frederic', 'Lacroix', 'professional', 'FRA'),
+    ('Henrik', 'Stenson', 'professional', 'SWE'),
+    ('Jack', 'Buchanan', 'amateur', 'RSA'),
+    ('Jack', 'McDonald', 'professional', 'SCO'),
+    ('Jeongwoo', 'Ham', 'professional', 'KOR'),
+    ('Jesper', 'Svensson', 'professional', 'SWE'),
+    ('Jiho', 'Yang', 'professional', 'KOR'),
+    ('Joakim', 'Lagergren', 'professional', 'SWE'),
+    ('Joe', 'Dean', 'professional', 'ENG'),
+    ('Jose Luis', 'Ballester Barrio', 'professional', 'ESP'),
+    ('Kazuma', 'Kobori', 'professional', 'NZL'),
+    ('Keita', 'Nakajima', 'professional', 'JPN'),
+    ('Lev', 'Grinberg', 'amateur', 'UKR'),
+    ('MJ', 'Daffue', 'professional', 'RSA'),
+    ('Marcus', 'Plunkett', 'professional', 'USA'),
+    ('Martin', 'Couvra', 'professional', 'FRA'),
+    ('Matthew', 'Baldwin', 'professional', 'ENG'),
+    ('Matthew', 'Southgate', 'professional', 'ENG'),
+    ('Michael', 'Hollick', 'professional', 'RSA'),
+    ('Nevill', 'Ruiter', 'amateur', 'NED'),
+    ('Ren', 'Yonezawa', 'professional', 'JPN'),
+    ('Ryutaro', 'Nagano', 'professional', 'JPN'),
+    ('Sam', 'Bairstow', 'professional', 'ENG'),
+    ('Scott', 'Vincent', 'professional', 'ZIM'),
+    ('Shaun', 'Norris', 'professional', 'RSA'),
+    ('Stuart', 'Grehan', 'amateur', 'IRL'),
+    ('Tiger', 'Christensen', 'professional', 'GER'),
+    ('Tim', 'Wiedemeyer', 'amateur', 'GER'),
+    ('Tom', 'Sloman', 'professional', 'ENG');
 
 COMMIT;
 
